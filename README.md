@@ -82,13 +82,7 @@ The tool automatically generates comprehensive plots for target analysis:
 - Includes reference lines for Earth, Neptune, and Jupiter radii
 - Log-log scale for better visualization
 
-### 4. Stellar Parameters (`stellar_parameters.png`)
-- Teff vs log g diagram
-- Distance vs Teff plot
-- Stellar radius and distance histograms
-- Essential for stellar characterization
-
-### 5. Observation Priority (`observation_priority.png`)
+### 4. Observation Priority (`observation_priority.png`)
 - KPF and NEID observation flags (pie charts)
 - Observation priority by instrument
 - Target distribution by semester

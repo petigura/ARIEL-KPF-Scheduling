@@ -23,7 +23,6 @@ And are publically accessible via this link:
 
 https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?usp=sharing
 
-
 Currently, I don't want to go currently, 
 
 As a first step, I would like to connect to this google sheet and display the following information
@@ -31,6 +30,8 @@ As a first step, I would like to connect to this google sheet and display the fo
 - target ra, dec
 - target vmag
 - target period, and radius
+
+This should be created as static not interactive plots
 
 # Observing strategy
 

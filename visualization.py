@@ -4,6 +4,10 @@ ARIEL-KPF Scheduling Tool - Visualization Module
 Creates plots for target analysis and scheduling.
 """
 
+# Set matplotlib to use non-interactive backend
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -70,7 +74,7 @@ def create_sky_plot(df, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Sky plot saved to: {save_path}")
     
-    plt.show()
+    plt.close()  # Close figure to free memory
 
 
 def create_magnitude_histogram(df, save_path=None):
@@ -107,7 +111,7 @@ def create_magnitude_histogram(df, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Magnitude histogram saved to: {save_path}")
     
-    plt.show()
+    plt.close()  # Close figure to free memory
 
 
 def create_period_radius_plot(df, save_path=None):
@@ -160,64 +164,9 @@ def create_period_radius_plot(df, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Period-radius plot saved to: {save_path}")
     
-    plt.show()
+    plt.close()  # Close figure to free memory
 
 
-def create_stellar_parameter_plot(df, save_path=None):
-    """
-    Create plots of stellar parameters.
-    
-    Parameters:
-    -----------
-    df : pandas.DataFrame
-        DataFrame containing target information
-    save_path : str, optional
-        Path to save the plot
-    """
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
-    
-    # Teff vs logg
-    valid_data = df.dropna(subset=['stellar_teff', 'stellar_logg'])
-    scatter1 = ax1.scatter(valid_data['stellar_teff'], valid_data['stellar_logg'], 
-                         c=valid_data['v_mag'], cmap='viridis', s=50, alpha=0.7)
-    ax1.set_xlabel('Effective Temperature (K)', fontsize=12)
-    ax1.set_ylabel('Surface Gravity (log g)', fontsize=12)
-    ax1.set_title('Stellar Teff vs log g', fontsize=12, fontweight='bold')
-    ax1.grid(True, alpha=0.3)
-    plt.colorbar(scatter1, ax=ax1, label='V-magnitude')
-    
-    # Distance vs Teff
-    valid_data2 = df.dropna(subset=['stellar_distance', 'stellar_teff'])
-    scatter2 = ax2.scatter(valid_data2['stellar_distance'], valid_data2['stellar_teff'], 
-                          c=valid_data2['v_mag'], cmap='plasma', s=50, alpha=0.7)
-    ax2.set_xlabel('Distance (pc)', fontsize=12)
-    ax2.set_ylabel('Effective Temperature (K)', fontsize=12)
-    ax2.set_title('Distance vs Teff', fontsize=12, fontweight='bold')
-    ax2.grid(True, alpha=0.3)
-    plt.colorbar(scatter2, ax=ax2, label='V-magnitude')
-    
-    # Stellar radius histogram
-    ax3.hist(df['stellar_radius'].dropna(), bins=30, alpha=0.7, color='orange', edgecolor='black')
-    ax3.set_xlabel('Stellar Radius (Solar radii)', fontsize=12)
-    ax3.set_ylabel('Number of Targets', fontsize=12)
-    ax3.set_title('Stellar Radius Distribution', fontsize=12, fontweight='bold')
-    ax3.grid(True, alpha=0.3)
-    
-    # Distance histogram
-    ax4.hist(df['stellar_distance'].dropna(), bins=30, alpha=0.7, color='purple', edgecolor='black')
-    ax4.set_xlabel('Distance (pc)', fontsize=12)
-    ax4.set_ylabel('Number of Targets', fontsize=12)
-    ax4.set_title('Distance Distribution', fontsize=12, fontweight='bold')
-    ax4.grid(True, alpha=0.3)
-    
-    plt.suptitle('Stellar Parameter Analysis', fontsize=14, fontweight='bold')
-    plt.tight_layout()
-    
-    if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"Stellar parameter plot saved to: {save_path}")
-    
-    plt.show()
 
 
 def create_observation_priority_plot(df, save_path=None):
@@ -283,7 +232,7 @@ def create_observation_priority_plot(df, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         print(f"Observation priority plot saved to: {save_path}")
     
-    plt.show()
+    plt.close()  # Close figure to free memory
 
 
 def create_all_plots(df, output_dir='plots'):
@@ -311,7 +260,6 @@ def create_all_plots(df, output_dir='plots'):
     create_sky_plot(df, f"{output_dir}/sky_distribution.png")
     create_magnitude_histogram(df, f"{output_dir}/magnitude_distributions.png")
     create_period_radius_plot(df, f"{output_dir}/period_radius_plot.png")
-    create_stellar_parameter_plot(df, f"{output_dir}/stellar_parameters.png")
     create_observation_priority_plot(df, f"{output_dir}/observation_priority.png")
     
     print("\n✅ All plots created successfully!")
