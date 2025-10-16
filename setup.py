@@ -33,16 +33,16 @@ def check_conda_environment():
     import os
     
     conda_env = os.environ.get('CONDA_DEFAULT_ENV', '')
-    if conda_env == 'ariel-kpf-scheduling':
+    if conda_env == 'ariel-rv':
         print(f"✓ Running in conda environment: {conda_env}")
         return True
     elif conda_env:
         print(f"⚠ Running in conda environment: {conda_env}")
-        print("  Consider activating: conda activate ariel-kpf-scheduling")
+        print("  Consider activating: conda activate ariel-rv")
         return True
     else:
         print("⚠ No conda environment detected")
-        print("  Create and activate environment: conda env create -f environment.yml && conda activate ariel-kpf-scheduling")
+        print("  Create and activate environment: conda env create -f environment.yml && conda activate ariel-rv")
         return False
 
 

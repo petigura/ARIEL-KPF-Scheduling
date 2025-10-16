@@ -4,7 +4,7 @@ to Keck observatory. These are batch submitted as json files, with fields descri
 
 Requirements:
 
-- use conda to manage the python environment
+- use conda environment called ariel-rv to manage the python environment
 
 - Use the following packages
  - astropy (for coordinate transformation)
@@ -22,5 +22,9 @@ As a first step, I would like to connect to this google sheet and display the fo
 
 - target ra, dec
 - target vmag
+- target period, and radius
+
+
+
 
 

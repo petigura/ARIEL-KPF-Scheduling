@@ -1,4 +1,4 @@
-name: ariel-kpf-scheduling
+name: ariel-rv
 channels:
   - conda-forge
   - defaults

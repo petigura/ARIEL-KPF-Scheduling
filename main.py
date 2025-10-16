@@ -80,7 +80,7 @@ def read_target_data(client, spreadsheet_url):
 
 def display_target_info(df):
     """
-    Display target RA, DEC, and V-magnitude information.
+    Display target RA, DEC, V-magnitude, period, and radius information.
     
     Parameters:
     -----------
@@ -100,7 +100,7 @@ def display_target_info(df):
     print(f"Columns available: {list(df.columns)}")
     print()
     
-    # Try to identify RA, DEC, and V-magnitude columns
+    # Try to identify RA, DEC, V-magnitude, period, and radius columns
     # Common column names for these fields
     ra_cols = [col for col in df.columns if any(keyword in col.lower() 
                for keyword in ['ra', 'right ascension', 'alpha'])]
@@ -108,21 +108,27 @@ def display_target_info(df):
                 for keyword in ['dec', 'declination', 'delta'])]
     vmag_cols = [col for col in df.columns if any(keyword in col.lower() 
                  for keyword in ['vmag', 'v_mag', 'magnitude', 'mag'])]
+    period_cols = [col for col in df.columns if any(keyword in col.lower() 
+                   for keyword in ['period', 'p', 'orbital period'])]
+    radius_cols = [col for col in df.columns if any(keyword in col.lower() 
+                   for keyword in ['radius', 'r', 'r_planet', 'r_p', 'planetary radius'])]
     
     print("Detected columns:")
     print(f"  RA columns: {ra_cols}")
     print(f"  DEC columns: {dec_cols}")
     print(f"  V-magnitude columns: {vmag_cols}")
+    print(f"  Period columns: {period_cols}")
+    print(f"  Radius columns: {radius_cols}")
     print()
     
     # Display first few rows of relevant data
-    relevant_cols = ra_cols + dec_cols + vmag_cols
+    relevant_cols = ra_cols + dec_cols + vmag_cols + period_cols + radius_cols
     if relevant_cols:
         print("Sample data (first 5 rows):")
         print("-" * 60)
         print(df[relevant_cols].head().to_string(index=False))
     else:
-        print("Could not automatically identify RA, DEC, or V-magnitude columns.")
+        print("Could not automatically identify RA, DEC, V-magnitude, period, or radius columns.")
         print("Available columns:")
         for i, col in enumerate(df.columns, 1):
             print(f"  {i:2d}. {col}")

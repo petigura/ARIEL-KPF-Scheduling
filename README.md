@@ -27,7 +27,7 @@ ARIEL-KPF-Scheduling/
 ### 1. Create Conda Environment
 ```bash
 conda env create -f environment.yml
-conda activate ariel-kpf-scheduling
+conda activate ariel-rv
 ```
 
 ### 2. Google Sheets API Setup
@@ -54,6 +54,8 @@ The current implementation focuses on Step 1 of the project:
   - Right Ascension (RA)
   - Declination (DEC) 
   - V-magnitude
+  - Target period
+  - Target radius
 - **Data Analysis**: Automatically detects relevant columns and provides data overview
 
 ## Target Spreadsheet
