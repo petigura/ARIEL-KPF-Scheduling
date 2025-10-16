@@ -15,7 +15,8 @@ A Python-based repository for scheduling targets on the Keck telescope. This too
 ```
 ARIEL-KPF-Scheduling/
 ├── main.py                 # Main script for step 1 - Google Sheets connection
-├── requirements.txt        # Python package dependencies
+├── environment.yml         # Conda environment specification
+├── requirements.txt        # Python package dependencies (legacy)
 ├── README.md              # This file
 ├── .gitignore             # Git ignore patterns
 └── credentials.json       # Google service account credentials (not tracked)
@@ -23,9 +24,10 @@ ARIEL-KPF-Scheduling/
 
 ## Setup Instructions
 
-### 1. Install Dependencies
+### 1. Create Conda Environment
 ```bash
-pip install -r requirements.txt
+conda env create -f environment.yml
+conda activate ariel-kpf-scheduling
 ```
 
 ### 2. Google Sheets API Setup
@@ -59,11 +61,16 @@ The current implementation focuses on Step 1 of the project:
 The targets are stored in this Google Spreadsheet:
 https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?gid=1500126039#gid=1500126039
 
+## Observing Blocks (OBs)
+
+The targets will be scheduled by submitting observing blocks (OBs) to Keck Observatory. These OBs are batch submitted as JSON files with specific fields and formatting requirements. This tool will eventually generate properly formatted JSON files for batch submission to Keck.
+
 ## Future Development
 
 This is the foundation for a more comprehensive scheduling tool that will:
 - Process target coordinates and magnitudes
-- Generate observing blocks (OBs) for Keck Observatory
+- Generate observing blocks (OBs) for Keck Observatory in JSON format
+- Batch submit OBs to Keck Observatory
 - Provide scheduling recommendations based on target visibility
 - Create visualizations for observing planning
 

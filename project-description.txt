@@ -1,8 +1,11 @@
 I would like to make a Python-based repository to help me schedule targets on the Keck telescope. 
 The targets are stored in a google spreadsheet and they will be scheduled by submitting observing blocks (OBs)
-to Keck observatory
+to Keck observatory. These are batch submitted as json files, with fields described below
 
 Requirements:
+
+- use conda to manage the python environment
+
 - Use the following packages
  - astropy (for coordinate transformation)
  - pandas (for data munging)

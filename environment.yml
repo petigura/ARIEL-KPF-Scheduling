@@ -1,0 +1,15 @@
+name: ariel-kpf-scheduling
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.8
+  - astropy>=5.0
+  - pandas>=1.5.0
+  - matplotlib>=3.5.0
+  - pip
+  - pip:
+    - google-api-python-client>=2.0.0
+    - google-auth-httplib2>=0.1.0
+    - google-auth-oauthlib>=0.5.0
+    - gspread>=5.0.0
