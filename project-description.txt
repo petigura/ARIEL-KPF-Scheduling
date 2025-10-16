@@ -1,6 +1,6 @@
 I would like to make a Python-based repository to help me schedule targets on the Keck telescope. 
 The targets are stored in a google spreadsheet and they will be scheduled by submitting observing blocks (OBs)
-to Keck observatory. These are batch submitted as json files, with fields described below
+to Keck observatory (see below).
 
 Requirements:
 
@@ -18,13 +18,30 @@ The targets are stored on this google spreadsheet
 
 https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?gid=1500126039#gid=1500126039
 
+
+And are publically accessible via this link:
+
+https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?usp=sharing
+
+
+Currently, I don't want to go currently, 
+
 As a first step, I would like to connect to this google sheet and display the following information
 
 - target ra, dec
 - target vmag
 - target period, and radius
 
+# Observing strategy
 
+The long-term observing strategy is to get four RVs of each Ariel target within a month. 
+This will be accomplished by using the 
 
+# Observing Blocks
 
+Observing blocks OBs are described on this website
+
+https://www2.keck.hawaii.edu/inst/kpf/buildingOBs/
+
+and the ob-template.json file is an example
 

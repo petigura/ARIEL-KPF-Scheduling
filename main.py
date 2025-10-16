@@ -11,6 +11,7 @@ from astropy import units as u
 import gspread
 from google.oauth2.service_account import Credentials
 import os
+from visualization import create_all_plots
 
 
 def connect_to_google_sheets():
@@ -64,13 +65,45 @@ def read_target_data_public(spreadsheet_url):
         else:
             raise ValueError("Invalid Google Spreadsheet URL format")
         
-        # Construct CSV export URL
-        csv_url = f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv&gid=0"
+        # Try different CSV export URLs
+        csv_urls = [
+            f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv&gid=0",
+            f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv",
+            f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv&gid=1500126039"
+        ]
         
-        # Read CSV data directly
-        df = pd.read_csv(csv_url)
+        for csv_url in csv_urls:
+            try:
+                print(f"Trying CSV URL: {csv_url}")
+                df = pd.read_csv(csv_url)
+                if not df.empty:
+                    print(f"✓ Successfully read data from: {csv_url}")
+                    return df
+            except Exception as e:
+                print(f"Failed with URL {csv_url}: {e}")
+                continue
         
-        return df
+        # If all CSV URLs fail, try using requests with headers
+        import requests
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        for csv_url in csv_urls:
+            try:
+                print(f"Trying with requests: {csv_url}")
+                response = requests.get(csv_url, headers=headers)
+                if response.status_code == 200:
+                    from io import StringIO
+                    df = pd.read_csv(StringIO(response.text))
+                    if not df.empty:
+                        print(f"✓ Successfully read data with requests from: {csv_url}")
+                        return df
+            except Exception as e:
+                print(f"Failed with requests for URL {csv_url}: {e}")
+                continue
+        
+        raise Exception("All public access methods failed")
         
     except Exception as e:
         print(f"Error reading public spreadsheet data: {e}")
@@ -191,6 +224,12 @@ def main():
     if df is not None and not df.empty:
         print("✓ Successfully read data via public access")
         display_target_info(df)
+        
+        # Create visualization plots
+        print("\n" + "="*60)
+        print("CREATING VISUALIZATION PLOTS")
+        print("="*60)
+        create_all_plots(df)
         return
     
     # If public access fails, try authenticated access
@@ -209,6 +248,12 @@ def main():
     
     print("✓ Successfully read data via authenticated access")
     display_target_info(df)
+    
+    # Create visualization plots
+    print("\n" + "="*60)
+    print("CREATING VISUALIZATION PLOTS")
+    print("="*60)
+    create_all_plots(df)
 
 
 if __name__ == "__main__":

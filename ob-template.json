@@ -1,0 +1,83 @@
+[
+  {
+    "calibration": {
+      "CalSource": "EtalonFiber",
+      "nExp": 1,
+      "TriggerCaHK": true,
+      "TriggerGreen": true,
+      "TriggerRed": true,
+      "CalND1": "OD 0.1",
+      "CalND2": "OD 0.1",
+      "OpenScienceShutter": true,
+      "OpenSkyShutter": true,
+      "TakeSimulCal": true,
+      "ExpMeterMode": "off",
+      "ExpMeterExpTime": 1,
+      "ExpMeterBin": 1,
+      "ExpMeterThreshold": 50000
+    },
+    "schedule": {
+      "SchedulingMode": "Cadence",
+      "DesiredVisitsPerNight": 1,
+      "MinVisitsPerNight": 1,
+      "NightsPerSemester": 2,
+      "interNightCadenceMin": 60,
+      "MinimumElevation": 30,
+      "MinimumMoonSeparation": 30,
+      "weather_band_1": true,
+      "weather_band_2": true,
+      "total_observations_requested": 2,
+      "total_time_for_target": 832,
+      "total_time_for_target_hours": 0.23
+    },
+    "target": {
+      "TargetName": "HIP7170",
+      "GaiaID": "DR2_5042734468172061440",
+      "twoMASSID": "J01322625-2154172",
+      "tic_id": "441493794",
+      "Parallax": 53.6727,
+      "RadialVelocity": -30.14,
+      "Gmag": 10.300416,
+      "Jmag": 7.977,
+      "RA": "01:32:26.2019886655",
+      "DEC": "-21:54:18.440863451",
+      "ra_deg": 23.1091749528,
+      "dec_deg": -21.905122462,
+      "Equinox": "J2000",
+      "PMRA": -587.871,
+      "PMDEC": -888.123,
+      "Epoch": 2000
+    },
+    "observation": {
+      "Object": "HIP7170",
+      "nExp": 1,
+      "ExpTime": 176,
+      "TriggerCaHK": true,
+      "TriggerGreen": true,
+      "TriggerRed": true,
+      "ExpMeterMode": "monitor",
+      "AutoExpMeter": true,
+      "ExpMeterExpTime": 1,
+      "ExpMeterThreshold": 50000,
+      "TakeSimulCal": true,
+      "AutoNDFilters": true,
+      "CalND1": "OD 0.1",
+      "CalND2": "OD 0.1",
+      "GuideHere": true
+    },
+    "metadata": {
+      "ObserverID": 3937,
+      "ObserverName": "Dr. Erik Petigura",
+      "Semid": "2025B_U246",
+      "Semester": "2025B",
+      "Progid": "U246",
+      "Tags": [],
+      "ob_feasible": true,
+      "Submitter": "Erik Petigura",
+      "submitted": true,
+      "details": "Passed all infeasibility checks",
+      "status": "SUCCESS",
+      "state": "OBSERVING_BLOCK_SUBMITTED"
+    }
+  }
+]

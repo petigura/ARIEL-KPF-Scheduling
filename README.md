@@ -15,10 +15,12 @@ A Python-based repository for scheduling targets on the Keck telescope. This too
 ```
 ARIEL-KPF-Scheduling/
 ├── main.py                 # Main script for step 1 - Google Sheets connection
+├── visualization.py        # Visualization module for creating plots
 ├── environment.yml         # Conda environment specification
 ├── requirements.txt        # Python package dependencies (legacy)
 ├── README.md              # This file
 ├── .gitignore             # Git ignore patterns
+├── plots/                 # Generated visualization plots
 └── credentials.json       # Google service account credentials (not tracked)
 ```
 
@@ -57,6 +59,40 @@ The current implementation focuses on Step 1 of the project:
   - Target period
   - Target radius
 - **Data Analysis**: Automatically detects relevant columns and provides data overview
+- **Visualization**: Creates comprehensive plots for target analysis and scheduling
+
+## Visualization Features
+
+The tool automatically generates comprehensive plots for target analysis:
+
+### 1. Sky Distribution Plot (`sky_distribution.png`)
+- Shows all 377 targets plotted in RA/DEC coordinates
+- Color-coded by V-magnitude
+- Includes Keck Observatory location marker
+- Helps visualize target distribution across the sky
+
+### 2. Magnitude Distributions (`magnitude_distributions.png`)
+- V-magnitude and TESS-magnitude histograms
+- Shows brightness distribution of targets
+- Useful for exposure time planning
+
+### 3. Planetary Period vs Radius (`period_radius_plot.png`)
+- Scatter plot of orbital period vs planet radius
+- Color-coded by V-magnitude
+- Includes reference lines for Earth, Neptune, and Jupiter radii
+- Log-log scale for better visualization
+
+### 4. Stellar Parameters (`stellar_parameters.png`)
+- Teff vs log g diagram
+- Distance vs Teff plot
+- Stellar radius and distance histograms
+- Essential for stellar characterization
+
+### 5. Observation Priority (`observation_priority.png`)
+- KPF and NEID observation flags (pie charts)
+- Observation priority by instrument
+- Target distribution by semester
+- Scheduling and priority analysis
 
 ## Target Spreadsheet
 
