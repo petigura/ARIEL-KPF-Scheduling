@@ -16,11 +16,13 @@ A Python-based repository for scheduling targets on the Keck telescope. This too
 ARIEL-KPF-Scheduling/
 ├── main.py                 # Main script for step 1 - Google Sheets connection
 ├── visualization.py        # Visualization module for creating plots
+├── night_allocation.py     # Night allocation download from Keck website
 ├── environment.yml         # Conda environment specification
 ├── requirements.txt        # Python package dependencies (legacy)
 ├── README.md              # This file
 ├── .gitignore             # Git ignore patterns
 ├── plots/                 # Generated visualization plots
+├── keck_night_allocation_sample.csv  # Sample night allocation template
 └── credentials.json       # Google service account credentials (not tracked)
 ```
 
@@ -47,6 +49,11 @@ The tool will first attempt to access the spreadsheet publicly without authentic
 python main.py
 ```
 
+### 4. Download Night Allocation Data (Optional)
+```bash
+python night_allocation.py
+```
+
 ## Current Features (Step 1)
 
 The current implementation focuses on Step 1 of the project:
@@ -60,6 +67,7 @@ The current implementation focuses on Step 1 of the project:
   - Target radius
 - **Data Analysis**: Automatically detects relevant columns and provides data overview
 - **Visualization**: Creates comprehensive plots for target analysis and scheduling
+- **Night Allocation**: Downloads Keck Observatory schedule data for KPF-CC instrument
 
 ## Visualization Features
 
@@ -95,6 +103,17 @@ The targets are stored in this Google Spreadsheet:
 - **Public URL**: https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?usp=sharing
 
 The tool will first attempt to access the spreadsheet publicly (no authentication required), and fall back to authenticated access if needed.
+
+## Night Allocation
+
+The tool can download night allocation data from the Keck Observatory website:
+
+- **Automatic Download**: Attempts to download KPF-CC schedule for semester 2025B
+- **Web Scraping**: Uses BeautifulSoup to parse Keck website forms
+- **Fallback Template**: Creates sample template if download fails
+- **Manual Instructions**: Provides clear instructions for manual download
+
+**Keck Schedule URL**: https://www2.keck.hawaii.edu/observing/keckSchedule/queryForm.php
 
 ## Observing Strategy
 

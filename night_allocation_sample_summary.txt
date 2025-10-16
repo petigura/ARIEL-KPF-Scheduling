@@ -1,7 +1,7 @@
 KECK NIGHT ALLOCATION SUMMARY
 ==================================================
-Generated: 2025-10-16 15:18:38
-Total nights: 10
+Generated: 2025-10-16 15:22:38
+Total nights: 20
 
 Available columns:
    1. Date
