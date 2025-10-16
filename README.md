@@ -51,6 +51,8 @@ python main.py
 
 ### 4. Download Night Allocation Data (Optional)
 ```bash
+# First, manually download kpfcc-2025B.csv from Keck website
+# Then analyze the data:
 python night_allocation.py
 ```
 
@@ -106,14 +108,22 @@ The tool will first attempt to access the spreadsheet publicly (no authenticatio
 
 ## Night Allocation
 
-The tool can download night allocation data from the Keck Observatory website:
+The tool reads night allocation data from the downloaded Keck Observatory CSV file:
 
-- **Automatic Download**: Attempts to download KPF-CC schedule for semester 2025B
-- **Web Scraping**: Uses BeautifulSoup to parse Keck website forms
-- **Fallback Template**: Creates sample template if download fails
-- **Manual Instructions**: Provides clear instructions for manual download
+- **CSV File**: `kpfcc-2025B.csv` (manually downloaded from Keck website)
+- **Analysis**: Processes KPF-CC nights for semester 2025B
+- **Summary**: Creates detailed analysis of available nights
+- **Statistics**: Shows account distribution and date ranges
 
 **Keck Schedule URL**: https://www2.keck.hawaii.edu/observing/keckSchedule/queryForm.php
+
+To download the CSV file:
+1. Go to the Keck schedule website
+2. Select: Instrument=KPF-CC, Semester=2025B
+3. Set date range: 2025-08-01 to 2025-12-31
+4. Check "Excel" format checkbox
+5. Click "Query Tel Schedule"
+6. Save as `kpfcc-2025B.csv`
 
 ## Observing Strategy
 
