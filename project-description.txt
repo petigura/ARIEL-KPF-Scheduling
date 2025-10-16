@@ -1,0 +1,23 @@
+I would like to make a Python-based repository to help me schedule targets on the Keck telescope. 
+The targets are stored in a google spreadsheet and they will be scheduled by submitting observing blocks (OBs)
+to Keck observatory
+
+Requirements:
+- Use the following packages
+ - astropy (for coordinate transformation)
+ - pandas (for data munging)
+ - matplotlib (for visualization)
+
+- git-track the project
+- build and update a README.md file that explains the different software components
+
+The targets are stored on this google spreadsheet
+
+https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?gid=1500126039#gid=1500126039
+
+As a first step, I would like to connect to this google sheet and display the following information
+
+- target ra, dec
+- target vmag
+
+
