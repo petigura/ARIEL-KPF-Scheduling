@@ -42,7 +42,42 @@ def connect_to_google_sheets():
         return None
 
 
-def read_target_data(client, spreadsheet_url):
+def read_target_data_public(spreadsheet_url):
+    """
+    Read target data from a publicly accessible Google Spreadsheet.
+    This method doesn't require authentication but may have limitations.
+    
+    Parameters:
+    -----------
+    spreadsheet_url : str
+        Public URL of the Google Spreadsheet
+        
+    Returns:
+    --------
+    pandas.DataFrame
+        DataFrame containing target information
+    """
+    try:
+        # Extract spreadsheet ID from URL
+        if 'spreadsheets/d/' in spreadsheet_url:
+            spreadsheet_id = spreadsheet_url.split('spreadsheets/d/')[1].split('/')[0]
+        else:
+            raise ValueError("Invalid Google Spreadsheet URL format")
+        
+        # Construct CSV export URL
+        csv_url = f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv&gid=0"
+        
+        # Read CSV data directly
+        df = pd.read_csv(csv_url)
+        
+        return df
+        
+    except Exception as e:
+        print(f"Error reading public spreadsheet data: {e}")
+        return None
+
+
+def read_target_data_authenticated(client, spreadsheet_url):
     """
     Read target data from the Google Spreadsheet.
     
@@ -143,20 +178,36 @@ def main():
     print("ARIEL-KPF Scheduling Tool - Step 1")
     print("Connecting to Google Sheets and displaying target information...")
     
-    # Google Spreadsheet URL
-    spreadsheet_url = "https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?gid=1500126039#gid=1500126039"
+    # Google Spreadsheet URLs
+    spreadsheet_url_public = "https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?usp=sharing"
+    spreadsheet_url_private = "https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?gid=1500126039#gid=1500126039"
     
-    # Connect to Google Sheets
+    print("\nAttempting to read spreadsheet data...")
+    
+    # Try public access first (no authentication required)
+    print("Trying public access...")
+    df = read_target_data_public(spreadsheet_url_public)
+    
+    if df is not None and not df.empty:
+        print("✓ Successfully read data via public access")
+        display_target_info(df)
+        return
+    
+    # If public access fails, try authenticated access
+    print("Public access failed, trying authenticated access...")
     client = connect_to_google_sheets()
     if client is None:
+        print("✗ Could not establish authenticated connection")
+        print("Please check your credentials.json file and Google Sheets API setup")
         return
     
-    # Read target data
-    df = read_target_data(client, spreadsheet_url)
+    # Read target data using authenticated access
+    df = read_target_data_authenticated(client, spreadsheet_url_private)
     if df is None:
+        print("✗ Could not read data via authenticated access")
         return
     
-    # Display target information
+    print("✓ Successfully read data via authenticated access")
     display_target_info(df)
 
 

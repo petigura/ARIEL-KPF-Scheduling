@@ -30,8 +30,8 @@ conda env create -f environment.yml
 conda activate ariel-rv
 ```
 
-### 2. Google Sheets API Setup
-To connect to the Google Spreadsheet, you need to set up Google Sheets API access:
+### 2. Google Sheets API Setup (Optional)
+The tool will first attempt to access the spreadsheet publicly without authentication. If you need authenticated access, set up Google Sheets API access:
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select an existing one
@@ -61,11 +61,22 @@ The current implementation focuses on Step 1 of the project:
 ## Target Spreadsheet
 
 The targets are stored in this Google Spreadsheet:
-https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?gid=1500126039#gid=1500126039
+- **Private URL**: https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?gid=1500126039#gid=1500126039
+- **Public URL**: https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/edit?usp=sharing
+
+The tool will first attempt to access the spreadsheet publicly (no authentication required), and fall back to authenticated access if needed.
+
+## Observing Strategy
+
+The long-term observing strategy is to get **four RVs of each Ariel target within a month**. This will be accomplished by using the Keck telescope with KPF (Keck Planet Finder) instrument.
 
 ## Observing Blocks (OBs)
 
-The targets will be scheduled by submitting observing blocks (OBs) to Keck Observatory. These OBs are batch submitted as JSON files with specific fields and formatting requirements. This tool will eventually generate properly formatted JSON files for batch submission to Keck.
+Observing blocks (OBs) are used to schedule targets on the Keck telescope. These OBs are batch submitted as JSON files with specific fields and formatting requirements. 
+
+**Keck OB Building Guide**: https://www2.keck.hawaii.edu/inst/kpf/buildingOBs/
+
+This tool will eventually generate properly formatted JSON files for batch submission to Keck Observatory.
 
 ## Future Development
 
