@@ -36,7 +36,9 @@ This should be created as static not interactive plots
 # Observing strategy
 
 The long-term observing strategy is to get four RVs of each Ariel target within a month. 
-This will be accomplished by using the 
+This will be accomplished by using the time constraint capability of the observing blocks. 
+We will bin the targets up by RA. As a first step, I would like to select targets
+RA = 20-24 hr between 11/1-12/1.
 
 # Observing Blocks
 
@@ -44,5 +46,24 @@ Observing blocks OBs are described on this website
 
 https://www2.keck.hawaii.edu/inst/kpf/buildingOBs/
 
-and the ob-template.json file is an example
+and the ob-template.json file is an example. This is a lightly annotated json file of a template observation, 
+it should be used to create new obs. Even though the annotations make the template an improperly formated
+json file, they should be retained because the describe what the columns do
 
+# The OBs will be uploaded manually to the Keck computers into N427
+
+# Plotting
+
+I would like to plot the airmass of all targets at the middle of the observation window.
+
+```
+import matplotlib.pyplot as plt
+from astropy.time import Time
+from astroplan import FixedTarget, Observer
+from astroplan.plots import plot_airmass
+
+time = Time('2018-01-02 19:00')
+target = FixedTarget.from_name('HD 189733')
+keck = Observer.at_site('Keck')
+plot_airmass(target, keck, time, brightness_shading=True, altitude_yaxis=True)
+```

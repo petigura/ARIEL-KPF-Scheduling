@@ -22,38 +22,38 @@
       "MinVisitsPerNight": 1,
       "NightsPerSemester": 4,
       "interNightCadenceMin": 1,
-      "MinimumElevation": "25",
+      "MinimumElevation": "30",
       "MinimumMoonSeparation": "30",
       "weather_band_1": true,
       "weather_band_2": true,
-      "total_observations_requested": 4,
-      "total_time_for_target": 1440,
-      "total_time_for_target_hours": 0.4,
+      "total_observations_requested": 4, # Leave blank, will be updated by KPF-CC webpage
+      "total_time_for_target": 1440, # Leave blank, will be updated by KPF-CC webpage
+      "total_time_for_target_hours": 0.4, # Leave blank, will be updated by KPF-CC webpage
       "custom_time_constraints": [
         {
-          "end_datetime": "2025-12-31T:12:00",
-          "start_datetime": "2025-12-01T:12:00"
+          "end_datetime": "2025-12-31T:12:00", # This field will be updated with the starting date of the observing sequence
+          "start_datetime": "2025-12-01T:12:00" # End date of the observing sequence
         }
       ]
     },
     "target": {
-      "TargetName": "TIC129637892",
-      "GaiaID": "DR3_6583751420965707648",
-      "twoMASSID": "J21242759-3751005",
-      "tic_id": "129637892",
-      "Parallax": 5.3179,
-      "RadialVelocity": "16.33",
-      "Gmag": 9.389569,
-      "Jmag": 8.534,
+      "TargetName": "TIC129637892", # Pull this line from the target spreadsheet
+      "GaiaID": "DR3_6583751420965707648", # Resolve with simbad
+      "twoMASSID": "J21242759-3751005", # Resolve with simbad
+      "tic_id": "129637892", # Pull from simbad
+      "Parallax": 5.3179,  # Pull from simbad
+      "RadialVelocity": "16.33", # Pull from simbad, leave blank if not available
+      "Gmag": 9.389569,  # Resolve with simbad
+      "Jmag": 8.534,  # Resolve with simbad
       "Teff": "6220",
-      "RA": "21:24:27.5858065560",
-      "DEC": "-37:51:00.552487788",
-      "ra_deg": 321.1149408606,
-      "dec_deg": -37.850153469,
+      "RA": "21:24:27.5858065560", # Resolve with simbad
+      "DEC": "-37:51:00.552487788", # Resolve with simbad
+      "ra_deg": 321.1149408606, # Resolve with simbad
+      "dec_deg": -37.850153469, # Resolve with simbad
       "Equinox": "J2000",
-      "PMRA": 7.125,
-      "PMDEC": -6.407,
-      "Epoch": 2000
+      "PMRA": 7.125, # Resolve with simbad
+      "PMDEC": -6.407, # Resolve with simbad
+      "Epoch": 2000 # Resolve with simbad
     },
     "observation": {
       "Object": "TIC57093805 ",
@@ -73,17 +73,6 @@
       "GuideHere": true
     },
     "metadata": {
-      "ObserverID": 3937,
-      "ObserverName": "Dr. Howard Isaacson",
-      "Semid": "2025B_N427",
-      "Semester": "2025B",
-      "Progid": "N427",
-      "Tags": [],
-      "Submitter": "Erik Petigura",
-      "submitted": true,
-      "details": " This request is definitely not feasible. Accept the limitation(s) or amend request in light of following warning(s): target is observable for fewer nights than requested",
-      "status": "SUCCESS",
-      "state": "OBSERVING_BLOCK_SUBMITTED"
     }
   }
 ]
