@@ -20,7 +20,7 @@ def load_template():
     dict : The template OB as a dictionary
     """
     print("Loading OB template...")
-    with open('ob-template.json', 'r') as f:
+    with open('../obs/ob-template.json', 'r') as f:
         json_content = f.read()
         
         # Remove inline comments (everything after # on each line)
@@ -50,7 +50,7 @@ def load_kpf_targets():
     pandas.DataFrame : DataFrame containing target information
     """
     print("\nLoading KPF target data...")
-    df = pd.read_csv('ariel_kpf_targets_20251016_162105.csv')
+    df = pd.read_csv('../ariel_kpf_targets_20251016_162105.csv')
     print(f"✓ Loaded {len(df)} KPF targets")
     return df
 
@@ -173,13 +173,13 @@ def generate_november_obs():
         print(f"  ✓ Created OB for TIC{int(row['ticid'])} (RA={row['ra']:.2f}°)")
     
     # Save full list
-    output_file_full = 'obs_november_2025.json'
+    output_file_full = '../obs/obs_november_2025.json'
     with open(output_file_full, 'w') as f:
         json.dump(obs_list, f, indent=2)
     print(f"\n✅ Saved {len(obs_list)} OBs to: {output_file_full}")
     
     # Save test file (first 2 targets)
-    output_file_test = 'obs_november_2025_test.json'
+    output_file_test = '../obs/obs_november_2025_test.json'
     test_obs_list = obs_list[:2]
     with open(output_file_test, 'w') as f:
         json.dump(test_obs_list, f, indent=2)
