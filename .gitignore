@@ -1,6 +1,9 @@
 # Plots directory
 plots/
 
+# AstroQ analysis outputs
+astroq_analysis/
+
 # Python
 __pycache__/
 *.py[cod]
