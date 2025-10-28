@@ -1,0 +1,146 @@
+[
+  {
+    "calibration": {
+      "CalSource": "EtalonFiber",
+      "nExp": 1,
+      "TriggerCaHK": true,
+      "TriggerGreen": true,
+      "TriggerRed": true,
+      "CalND1": "OD 0.1",
+      "CalND2": "OD 0.1",
+      "OpenScienceShutter": true,
+      "OpenSkyShutter": true,
+      "TakeSimulCal": true,
+      "ExpMeterMode": "off",
+      "ExpMeterExpTime": 1,
+      "ExpMeterBin": 1,
+      "ExpMeterThreshold": 50000
+    },
+    "schedule": {
+      "SchedulingMode": "Cadence",
+      "DesiredVisitsPerNight": 1,
+      "MinVisitsPerNight": 1,
+      "NightsPerSemester": 4,
+      "interNightCadenceMin": 1,
+      "MinimumElevation": "30",
+      "MinimumMoonSeparation": "30",
+      "weather_band_1": true,
+      "weather_band_2": true,
+      "custom_time_constraints": [
+        {
+          "start_datetime": "2025-11-01T12:00",
+          "end_datetime": "2025-12-01T12:00"
+        }
+      ]
+    },
+    "target": {
+      "TargetName": "TIC117689799",
+      "GaiaID": "DR3_6583751420965707648",
+      "twoMASSID": "J21242759-3751005",
+      "tic_id": "117689799",
+      "Parallax": 5.3179,
+      "RadialVelocity": "16.33",
+      "Gmag": 9.389569,
+      "Jmag": 8.534,
+      "Teff": "6220",
+      "RA": "20:02:56.40",
+      "DEC": "24:26:06.49",
+      "ra_deg": 300.735006,
+      "dec_deg": 24.435135,
+      "Equinox": "J2000",
+      "PMRA": 7.125,
+      "PMDEC": -6.407,
+      "Epoch": 2000
+    },
+    "observation": {
+      "Object": "TIC117689799",
+      "nExp": "1",
+      "ExpTime": "120",
+      "TriggerCaHK": true,
+      "TriggerGreen": true,
+      "TriggerRed": true,
+      "ExpMeterMode": "monitor",
+      "AutoExpMeter": true,
+      "ExpMeterExpTime": 1,
+      "ExpMeterThreshold": 50000,
+      "TakeSimulCal": true,
+      "AutoNDFilters": true,
+      "CalND1": "OD 0.1",
+      "CalND2": "OD 0.1",
+      "GuideHere": true
+    },
+    "metadata": {}
+  },
+  {
+    "calibration": {
+      "CalSource": "EtalonFiber",
+      "nExp": 1,
+      "TriggerCaHK": true,
+      "TriggerGreen": true,
+      "TriggerRed": true,
+      "CalND1": "OD 0.1",
+      "CalND2": "OD 0.1",
+      "OpenScienceShutter": true,
+      "OpenSkyShutter": true,
+      "TakeSimulCal": true,
+      "ExpMeterMode": "off",
+      "ExpMeterExpTime": 1,
+      "ExpMeterBin": 1,
+      "ExpMeterThreshold": 50000
+    },
+    "schedule": {
+      "SchedulingMode": "Cadence",
+      "DesiredVisitsPerNight": 1,
+      "MinVisitsPerNight": 1,
+      "NightsPerSemester": 4,
+      "interNightCadenceMin": 1,
+      "MinimumElevation": "30",
+      "MinimumMoonSeparation": "30",
+      "weather_band_1": true,
+      "weather_band_2": true,
+      "custom_time_constraints": [
+        {
+          "start_datetime": "2025-11-01T12:00",
+          "end_datetime": "2025-12-01T12:00"
+        }
+      ]
+    },
+    "target": {
+      "TargetName": "TIC274641986",
+      "GaiaID": "DR3_6583751420965707648",
+      "twoMASSID": "J21242759-3751005",
+      "tic_id": "274641986",
+      "Parallax": 5.3179,
+      "RadialVelocity": "16.33",
+      "Gmag": 9.389569,
+      "Jmag": 8.534,
+      "Teff": "6220",
+      "RA": "20:05:15.46",
+      "DEC": "37:20:59.29",
+      "ra_deg": 301.314408,
+      "dec_deg": 37.349804,
+      "Equinox": "J2000",
+      "PMRA": 7.125,
+      "PMDEC": -6.407,
+      "Epoch": 2000
+    },
+    "observation": {
+      "Object": "TIC274641986",
+      "nExp": "1",
+      "ExpTime": "120",
+      "TriggerCaHK": true,
+      "TriggerGreen": true,
+      "TriggerRed": true,
+      "ExpMeterMode": "monitor",
+      "AutoExpMeter": true,
+      "ExpMeterExpTime": 1,
+      "ExpMeterThreshold": 50000,
+      "TakeSimulCal": true,
+      "AutoNDFilters": true,
+      "CalND1": "OD 0.1",
+      "CalND2": "OD 0.1",
+      "GuideHere": true
+    },
+    "metadata": {}
+  }
+]
