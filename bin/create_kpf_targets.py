@@ -12,7 +12,7 @@ def create_kpf_targets_csv():
     print("Creating KPF targets CSV...")
     
     # Read the full dataset
-    df = pd.read_csv('ariel_targets_20251016_161910.csv')
+    df = pd.read_csv('../targets/ariel_targets_20251016_161910.csv')
     
     # Filter for KPF targets only
     kpf_targets = df[df['observe_kpf'] == True].copy()
@@ -22,7 +22,7 @@ def create_kpf_targets_csv():
     
     # Save KPF targets to separate CSV
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"ariel_kpf_targets_{timestamp}.csv"
+    filename = f"../targets/ariel_kpf_targets_{timestamp}.csv"
     kpf_targets.to_csv(filename, index=False)
     
     print(f"✅ KPF targets saved to: {filename}")

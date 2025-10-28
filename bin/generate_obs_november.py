@@ -50,7 +50,7 @@ def load_kpf_targets():
     pandas.DataFrame : DataFrame containing target information
     """
     print("\nLoading KPF target data...")
-    df = pd.read_csv('../ariel_kpf_targets_20251016_162105.csv')
+    df = pd.read_csv('../targets/ariel_kpf_targets_20251016_162105.csv')
     print(f"✓ Loaded {len(df)} KPF targets")
     return df
 

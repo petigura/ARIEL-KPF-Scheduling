@@ -20,12 +20,13 @@ ARIEL-KPF-Scheduling/
 │   ├── ob-template.json          # OB template with annotations
 │   ├── obs_november_2025.json    # Full November OB list (32 targets)
 │   └── obs_november_2025_test.json  # Test file (first 2 targets)
+├── targets/                      # Target data files
+│   ├── ariel_kpf_targets_20251016_162105.csv  # KPF targets only (131 targets)
+│   └── ariel_targets_20251016_161910.csv      # Full target dataset (377 targets)
 ├── plots/                        # Generated plots (gitignored)
 │   ├── november_airmass_all.png
 │   └── november_targets_context.png
 ├── astroq_analysis/              # AstroQ analysis outputs (gitignored)
-├── ariel_kpf_targets_*.csv       # Target data files
-├── ariel_targets_*.csv           # Full target dataset
 ├── environment.yml               # Conda environment specification
 ├── requirements.txt              # Python package dependencies
 ├── project-description.txt       # Project requirements and guidelines

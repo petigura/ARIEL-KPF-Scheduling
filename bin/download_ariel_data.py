@@ -26,7 +26,7 @@ def download_ariel_targets_csv():
         
         # Save as CSV
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"ariel_targets_{timestamp}.csv"
+        filename = f"../targets/ariel_targets_{timestamp}.csv"
         df.to_csv(filename, index=False)
         
         print(f"💾 Data saved to: {filename}")

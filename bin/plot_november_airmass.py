@@ -36,7 +36,7 @@ def plot_november_airmass():
     
     # Load target data
     print("\n1. Loading target data...")
-    csv_file = "ariel_kpf_targets_20251016_162105.csv"
+    csv_file = "../targets/ariel_kpf_targets_20251016_162105.csv"
     df = pd.read_csv(csv_file)
     
     # Filter for KPF targets only
