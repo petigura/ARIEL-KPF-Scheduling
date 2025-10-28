@@ -1,3 +1,5 @@
+# I used this prompt to generate the initial repo
+
 I would like to make a Python-based repository to help me schedule targets on the Keck telescope. 
 The targets are stored in a google spreadsheet and they will be scheduled by submitting observing blocks (OBs)
 to Keck observatory (see below).

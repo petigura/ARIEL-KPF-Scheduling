@@ -121,7 +121,7 @@ def plot_november_airmass():
     ax.axhline(y=2, color='r', linestyle='--', alpha=0.3, label='Airmass = 2')
     
     plt.tight_layout()
-    output_file = 'plots/november_airmass_all.png'
+    output_file = '../plots/november_airmass_all.png'
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     print(f"   Saved: {output_file}")
     plt.close()

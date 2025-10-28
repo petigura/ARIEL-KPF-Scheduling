@@ -109,7 +109,7 @@ def plot_november_targets():
     plt.tight_layout()
     
     # Save figure
-    output_file = 'plots/november_targets_context.png'
+    output_file = '../plots/november_targets_context.png'
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     print(f"\n2. Plot saved to: {output_file}")
     plt.close()
