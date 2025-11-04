@@ -16,29 +16,31 @@ from ariel_kpf.paths import TARGETS_DIR, OBS_DIR, OB_TEMPLATE, get_latest_kpf_ta
 # Hard-coded year for this observing semester
 YEAR = 2025
 
-# Month-to-RA mapping for the three observing months
-MONTH_RA_RANGES = {
-    'nov': {
-        'ra_min': 300, 
-        'ra_max': 360, 
-        'full_name': 'November',
-        'start_date': '2025-11-01T12:00',
-        'end_date': '2025-12-01T12:00'
-    },
-    'dec': {
-        'ra_min': 0, 
-        'ra_max': 60, 
-        'full_name': 'December',
-        'start_date': '2025-12-01T12:00',
-        'end_date': '2026-01-01T12:00'
-    },
-    'jan': {
-        'ra_min': 60, 
-        'ra_max': 120, 
-        'full_name': 'January',
-        'start_date': '2026-01-01T12:00',
-        'end_date': '2026-02-01T12:00'
-    },
+# Observing strategies - nested dictionary: STRATEGIES[version][month]
+STRATEGIES = {
+    'version1': {
+        'nov': {
+            'ra_min': 300, 
+            'ra_max': 360, 
+            'full_name': 'November',
+            'start_date': '2025-11-01T12:00',
+            'end_date': '2025-12-01T12:00'
+        },
+        'dec': {
+            'ra_min': 0, 
+            'ra_max': 60, 
+            'full_name': 'December',
+            'start_date': '2025-12-01T12:00',
+            'end_date': '2026-01-01T12:00'
+        },
+        'jan': {
+            'ra_min': 60, 
+            'ra_max': 120, 
+            'full_name': 'January',
+            'start_date': '2026-01-01T12:00',
+            'end_date': '2026-02-01T12:00'
+        }
+    }
 }
 
 def load_template():
@@ -170,12 +172,10 @@ def create_ob_for_target(target_row, template_ob, start_date, end_date):
     
     # Update observation parameters from target data
     if 't_sec_kpf' in target_row.index and not pd.isna(target_row['t_sec_kpf']):
-        ob['observation']['ExpTime'] = str(int(target_row['t_sec_kpf']))
+        ob['observation']['ExpTime'] = str(int(target_row['t_sec_kpf'] * 4)) # multiply by 4 to account for upto 4x slowdown
     
     if 'expmeter_kpf' in target_row.index and not pd.isna(target_row['expmeter_kpf']):
-        # Convert expmeter_kpf to counts (expmeter_kpf is a fraction, multiply by 100000 for counts)
-        expmeter_threshold = int(target_row['expmeter_kpf'] * 100000)
-        ob['observation']['ExpMeterThreshold'] = expmeter_threshold
+        ob['observation']['ExpMeterThreshold'] = target_row['expmeter_kpf']
     
     # Update schedule section with time constraints
     ob['schedule']['custom_time_constraints'] = [
@@ -199,29 +199,39 @@ def create_ob_for_target(target_row, template_ob, start_date, end_date):
     
     return ob
 
-def generate_obs(month, num_test_targets=2):
+def generate_obs(month, strategy='version1', num_test_targets=2):
     """
-    Main function to generate observing blocks for a specific month.
+    Main function to generate observing blocks for a specific month using a strategy.
     
     Parameters:
     -----------
     month : str
         Month abbreviation ('nov', 'dec', 'jan')
+    strategy : str
+        Strategy version to use (default: 'version1')
     num_test_targets : int
         Number of targets to include in test file
     """
     month = month.lower()
     
-    if month not in MONTH_RA_RANGES:
-        print(f"❌ Error: Invalid month '{month}'")
-        print(f"Valid months: {', '.join(MONTH_RA_RANGES.keys())}")
+    # Validate strategy
+    if strategy not in STRATEGIES:
+        print(f"❌ Error: Invalid strategy '{strategy}'")
+        print(f"Valid strategies: {', '.join(STRATEGIES.keys())}")
         return
     
-    month_info = MONTH_RA_RANGES[month]
+    # Validate month for this strategy
+    if month not in STRATEGIES[strategy]:
+        print(f"❌ Error: Invalid month '{month}' for strategy '{strategy}'")
+        print(f"Valid months for {strategy}: {', '.join(STRATEGIES[strategy].keys())}")
+        return
+    
+    month_info = STRATEGIES[strategy][month]
     month_full = month_info['full_name']
     
     print("="*60)
     print(f"GENERATING {month_full.upper()} {YEAR} OBSERVING BLOCKS")
+    print(f"Strategy: {strategy}")
     print("="*60)
     
     # Load template and target data
@@ -266,6 +276,7 @@ def generate_obs(month, num_test_targets=2):
     print("\n" + "="*60)
     print("SUMMARY")
     print("="*60)
+    print(f"Strategy: {strategy}")
     print(f"Month: {month_full}")
     print(f"Total targets: {len(obs_list)}")
     print(f"Observation window: {start_date} to {end_date}")
@@ -282,10 +293,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s --month nov
+  %(prog)s --month nov                    # Use default strategy (version1)
   %(prog)s --month dec
-  %(prog)s --month jan        # Observes in January 2026
-  %(prog)s -m nov -t 5        # With 5 test targets
+  %(prog)s --strategy version1 --month jan
+  %(prog)s -s version1 -m nov -t 5        # With 5 test targets
         """
     )
     
@@ -298,6 +309,14 @@ Examples:
     )
     
     parser.add_argument(
+        '-s', '--strategy',
+        type=str,
+        default='version1',
+        choices=['version1'],
+        help='Observing strategy version (default: version1)'
+    )
+    
+    parser.add_argument(
         '-t', '--test-targets',
         type=int,
         default=2,
@@ -306,7 +325,7 @@ Examples:
     
     args = parser.parse_args()
     
-    generate_obs(args.month, args.test_targets)
+    generate_obs(args.month, args.strategy, args.test_targets)
 
 if __name__ == "__main__":
     main()

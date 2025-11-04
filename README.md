@@ -73,7 +73,7 @@ Filters KPF targets from the full ARIEL dataset. Automatically uses the most rec
 ### Generate Observing Blocks
 
 ```bash
-# Generate November observations (RA 20-24 hr, 300-360°)
+# Generate November observations using default strategy (version1)
 python bin/generate_obs.py --month nov
 
 # Generate December observations (RA 0-4 hr, 0-60°)
@@ -82,12 +82,18 @@ python bin/generate_obs.py --month dec
 # Generate January observations (RA 4-8 hr, 60-120°)
 python bin/generate_obs.py --month jan
 
-# With custom number of test targets
-python bin/generate_obs.py --month nov --test-targets 5
+# Explicitly specify strategy version
+python bin/generate_obs.py --strategy version1 --month nov
+
+# Short form with custom number of test targets
+python bin/generate_obs.py -s version1 -m nov -t 5
 ```
 
+**Strategy Versions:**
+- `version1` (default): November (20-24h), December (0-4h), January (4-8h)
+
 This will:
-- Filter targets by the specified month's RA range
+- Filter targets by the specified month's RA range using the chosen strategy
 - Automatically use the most recent KPF targets file
 - Generate OBs with appropriate observation windows
 - Create two output files:
@@ -122,4 +128,5 @@ Generates `plots/november_airmass_all.png` showing:
 - **Centralized Path Management**: All data directories are managed by the `ariel_kpf` package, so scripts work from any directory
 - **Automatic File Discovery**: Scripts automatically find and use the most recent target files
 - **Multi-Month Support**: Generate observations for November, December, and January with appropriate RA ranges
-- **Flexible Configuration**: Easy to modify RA ranges, observation windows, and other parameters in the `generate_obs.py` script
+- **Strategy Versioning**: Support for multiple observing strategies with version tags, enabling A/B testing and strategy evolution
+- **Flexible Configuration**: Easy to add new strategy versions or modify RA ranges, observation windows, and other parameters
