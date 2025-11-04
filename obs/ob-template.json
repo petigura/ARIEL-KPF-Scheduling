@@ -43,14 +43,14 @@
     "observation": {
       "Object": "TIC57093805 ",
       "nExp": "1",
-      "ExpTime": "120",
+      "ExpTime": "120", # since we running with exposure time on, this is the maximum time before termination
       "TriggerCaHK": true,
       "TriggerGreen": true,
       "TriggerRed": true,
-      "ExpMeterMode": "monitor",
+      "ExpMeterMode": "control", # conrol will terminate the observation if the expmeter is triggered
       "AutoExpMeter": true,
-      "ExpMeterExpTime": 1,
-      "ExpMeterThreshold": 50000,
+      "ExpMeterExpTime": 1, # update this value from t_sec_kpf, but we want multiply by 4x to account for upto 4x slowdown 
+      "ExpMeterThreshold": 1, # update this value from expmeter_kpf, units are Mphotons/Ang.
       "TakeSimulCal": true,
       "AutoNDFilters": true,
       "CalND1": "OD 0.1",
@@ -58,6 +58,9 @@
       "GuideHere": true
     },
     "metadata": {
+      "Tags": [
+        "test" # this tag specifies the batch of the obs
+      ]
     }
   }
 ]

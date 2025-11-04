@@ -126,7 +126,7 @@ def filter_targets_by_ra(df, ra_min, ra_max):
     
     return df_filtered
 
-def create_ob_for_target(target_row, template_ob, start_date, end_date):
+def create_ob_for_target(target_row, template_ob, start_date, end_date, strategy='version1'):
     """
     Create an Observing Block (OB) for a single target.
     
@@ -140,6 +140,8 @@ def create_ob_for_target(target_row, template_ob, start_date, end_date):
         Start date in format "YYYY-MM-DDTHH:MM"
     end_date : str
         End date in format "YYYY-MM-DDTHH:MM"
+    strategy : str
+        Strategy version tag (default: 'version1')
         
     Returns:
     --------
@@ -193,9 +195,12 @@ def create_ob_for_target(target_row, template_ob, start_date, end_date):
     if 'total_time_for_target_hours' in ob['schedule']:
         del ob['schedule']['total_time_for_target_hours']
     
-    # Ensure metadata section exists as empty dict
+    # Ensure metadata section exists and add tags
     if 'metadata' not in ob:
         ob['metadata'] = {}
+    
+    # Add strategy tag as a list
+    ob['metadata']['Tags'] = [strategy]
     
     return ob
 
@@ -255,7 +260,7 @@ def generate_obs(month, strategy='version1', num_test_targets=2):
     print("\nGenerating OBs...")
     obs_list = []
     for idx, row in df_filtered.iterrows():
-        ob = create_ob_for_target(row, template_ob, start_date, end_date)
+        ob = create_ob_for_target(row, template_ob, start_date, end_date, strategy)
         obs_list.append(ob)
         print(f"  ✓ Created OB for TIC{int(row['ticid'])} (RA={row['ra']:.2f}°)")
     
