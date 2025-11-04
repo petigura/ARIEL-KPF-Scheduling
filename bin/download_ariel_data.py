@@ -6,6 +6,7 @@ Download ARIEL targets data from Google Sheets and save as CSV
 import pandas as pd
 import requests
 from datetime import datetime
+from ariel_kpf.paths import TARGETS_DIR
 
 def download_ariel_targets_csv():
     """Download ARIEL targets data from Google Sheets and save as CSV."""
@@ -26,7 +27,7 @@ def download_ariel_targets_csv():
         
         # Save as CSV
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"../targets/ariel_targets_{timestamp}.csv"
+        filename = TARGETS_DIR / f"ariel_targets_{timestamp}.csv"
         df.to_csv(filename, index=False)
         
         print(f"💾 Data saved to: {filename}")

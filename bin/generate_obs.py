@@ -11,6 +11,7 @@ import copy
 import argparse
 from astropy.coordinates import SkyCoord
 from astropy import units as u
+from ariel_kpf.paths import TARGETS_DIR, OBS_DIR, OB_TEMPLATE, get_latest_kpf_targets_file
 
 # Hard-coded year for this observing semester
 YEAR = 2025
@@ -50,7 +51,7 @@ def load_template():
     dict : The template OB as a dictionary
     """
     print("Loading OB template...")
-    with open('../obs/ob-template.json', 'r') as f:
+    with open(OB_TEMPLATE, 'r') as f:
         json_content = f.read()
         
         # Remove inline comments (everything after # on each line)
@@ -79,7 +80,16 @@ def load_kpf_targets():
     pandas.DataFrame : DataFrame containing target information
     """
     print("\nLoading KPF target data...")
-    df = pd.read_csv('../targets/ariel_kpf_targets_20251016_162105.csv')
+    
+    # Use the latest KPF targets file
+    latest_file = get_latest_kpf_targets_file()
+    if latest_file is None:
+        print(f"❌ No KPF targets file found in {TARGETS_DIR}")
+        print("Please run create_kpf_targets.py first")
+        raise FileNotFoundError("No KPF targets file found")
+    
+    print(f"Reading: {latest_file.name}")
+    df = pd.read_csv(latest_file)
     print(f"✓ Loaded {len(df)} KPF targets")
     return df
 
@@ -231,13 +241,13 @@ def generate_obs(month, num_test_targets=2):
         print(f"  ✓ Created OB for TIC{int(row['ticid'])} (RA={row['ra']:.2f}°)")
     
     # Save full list
-    output_file_full = f'../obs/obs_{month}_{YEAR}.json'
+    output_file_full = OBS_DIR / f'obs_{month}_{YEAR}.json'
     with open(output_file_full, 'w') as f:
         json.dump(obs_list, f, indent=2)
     print(f"\n✅ Saved {len(obs_list)} OBs to: {output_file_full}")
     
     # Save test file
-    output_file_test = f'../obs/obs_{month}_{YEAR}_test.json'
+    output_file_test = OBS_DIR / f'obs_{month}_{YEAR}_test.json'
     test_obs_list = obs_list[:num_test_targets]
     with open(output_file_test, 'w') as f:
         json.dump(test_obs_list, f, indent=2)

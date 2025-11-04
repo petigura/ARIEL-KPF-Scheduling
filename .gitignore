@@ -1,6 +1,9 @@
 # Plots directory
 plots/
 
+# Generated observation files
+obs/obs_*.json
+
 # AstroQ analysis outputs
 astroq_analysis/
 

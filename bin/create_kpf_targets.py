@@ -5,14 +5,22 @@ Create filtered CSV with only KPF targets for analysis
 
 import pandas as pd
 from datetime import datetime
+from ariel_kpf.paths import TARGETS_DIR, get_latest_targets_file
 
 def create_kpf_targets_csv():
     """Create a CSV file containing only KPF targets."""
     
     print("Creating KPF targets CSV...")
     
-    # Read the full dataset
-    df = pd.read_csv('../targets/ariel_targets_20251016_161910.csv')
+    # Read the full dataset (use latest file)
+    latest_file = get_latest_targets_file()
+    if latest_file is None:
+        print("❌ No ARIEL targets file found!")
+        print(f"Please run download_ariel_data.py first or place a file in {TARGETS_DIR}")
+        return None, None
+    
+    print(f"Reading: {latest_file.name}")
+    df = pd.read_csv(latest_file)
     
     # Filter for KPF targets only
     kpf_targets = df[df['observe_kpf'] == True].copy()
@@ -22,7 +30,7 @@ def create_kpf_targets_csv():
     
     # Save KPF targets to separate CSV
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"../targets/ariel_kpf_targets_{timestamp}.csv"
+    filename = TARGETS_DIR / f"ariel_kpf_targets_{timestamp}.csv"
     kpf_targets.to_csv(filename, index=False)
     
     print(f"✅ KPF targets saved to: {filename}")
