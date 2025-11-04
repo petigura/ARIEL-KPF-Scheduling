@@ -73,32 +73,27 @@ Filters KPF targets from the full ARIEL dataset. Automatically uses the most rec
 ### Generate Observing Blocks
 
 ```bash
-# Generate November observations using default strategy (version1)
-python bin/generate_obs.py --month nov
-
-# Generate December observations (RA 0-4 hr, 0-60°)
-python bin/generate_obs.py --month dec
-
-# Generate January observations (RA 4-8 hr, 60-120°)
-python bin/generate_obs.py --month jan
+# Generate all months using default strategy (version1)
+python bin/generate_obs.py
 
 # Explicitly specify strategy version
-python bin/generate_obs.py --strategy version1 --month nov
+python bin/generate_obs.py --strategy version1
 
 # Short form with custom number of test targets
-python bin/generate_obs.py -s version1 -m nov -t 5
+python bin/generate_obs.py -s version1 -t 5
 ```
 
 **Strategy Versions:**
 - `version1` (default): November (20-24h), December (0-4h), January (4-8h)
 
 This will:
-- Filter targets by the specified month's RA range using the chosen strategy
+- Process all months defined in the strategy (November, December, January)
+- Filter targets by each month's RA range
 - Automatically use the most recent KPF targets file
-- Generate OBs with appropriate observation windows
+- Generate OBs with appropriate observation windows for each month
 - Create two output files:
-  - `obs/obs_{month}_2025.json` - All targets for that month
-  - `obs/obs_{month}_2025_test.json` - First 2 targets (for testing upload)
+  - `obs/obs_<strategy>.json` - All targets from all months (e.g., `obs_version1.json`)
+  - `obs/obs_<strategy>_test.json` - First 2 targets (for testing upload)
 
 ### Plot November Target Distribution
 

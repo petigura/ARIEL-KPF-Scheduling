@@ -204,75 +204,87 @@ def create_ob_for_target(target_row, template_ob, start_date, end_date, strategy
     
     return ob
 
-def generate_obs(month, strategy='version1', num_test_targets=2):
+def generate_obs(strategy='version1', num_test_targets=2):
     """
-    Main function to generate observing blocks for a specific month using a strategy.
+    Main function to generate observing blocks for all months in a strategy.
     
     Parameters:
     -----------
-    month : str
-        Month abbreviation ('nov', 'dec', 'jan')
     strategy : str
         Strategy version to use (default: 'version1')
     num_test_targets : int
         Number of targets to include in test file
     """
-    month = month.lower()
-    
     # Validate strategy
     if strategy not in STRATEGIES:
         print(f"❌ Error: Invalid strategy '{strategy}'")
         print(f"Valid strategies: {', '.join(STRATEGIES.keys())}")
         return
     
-    # Validate month for this strategy
-    if month not in STRATEGIES[strategy]:
-        print(f"❌ Error: Invalid month '{month}' for strategy '{strategy}'")
-        print(f"Valid months for {strategy}: {', '.join(STRATEGIES[strategy].keys())}")
-        return
-    
-    month_info = STRATEGIES[strategy][month]
-    month_full = month_info['full_name']
-    
     print("="*60)
-    print(f"GENERATING {month_full.upper()} {YEAR} OBSERVING BLOCKS")
-    print(f"Strategy: {strategy}")
+    print(f"GENERATING OBSERVING BLOCKS - STRATEGY: {strategy}")
+    print(f"Year: {YEAR}B")
     print("="*60)
     
-    # Load template and target data
+    # Load template and target data once
     template_ob = load_template()
     df = load_kpf_targets()
     
-    # Get RA range and time window for this month
-    ra_min = month_info['ra_min']
-    ra_max = month_info['ra_max']
-    start_date = month_info['start_date']
-    end_date = month_info['end_date']
+    # Collect all observations across all months
+    all_obs = []
+    month_summaries = []
     
-    # Filter targets by RA range
-    df_filtered = filter_targets_by_ra(df, ra_min, ra_max)
+    # Process each month in the strategy
+    for month, month_info in STRATEGIES[strategy].items():
+        month_full = month_info['full_name']
+        ra_min = month_info['ra_min']
+        ra_max = month_info['ra_max']
+        start_date = month_info['start_date']
+        end_date = month_info['end_date']
+        
+        print(f"\n{'='*60}")
+        print(f"Processing {month_full.upper()} (RA {ra_min/15:.1f}-{ra_max/15:.1f} hr)")
+        print(f"{'='*60}")
+        
+        # Filter targets by RA range
+        df_filtered = filter_targets_by_ra(df, ra_min, ra_max)
+        
+        if len(df_filtered) == 0:
+            print(f"⚠ No targets found for {month_full} window - skipping")
+            continue
+        
+        # Generate OBs for all filtered targets
+        print("Generating OBs...")
+        month_obs = []
+        for idx, row in df_filtered.iterrows():
+            ob = create_ob_for_target(row, template_ob, start_date, end_date, strategy)
+            month_obs.append(ob)
+            all_obs.append(ob)
+            print(f"  ✓ Created OB for TIC{int(row['ticid'])} (RA={row['ra']:.2f}°)")
+        
+        # Store summary for this month
+        month_summaries.append({
+            'month': month_full,
+            'count': len(month_obs),
+            'ra_range': f"{ra_min}° to {ra_max}° ({ra_min/15:.1f}-{ra_max/15:.1f} hr)",
+            'time_window': f"{start_date} to {end_date}"
+        })
+        
+        print(f"✓ Generated {len(month_obs)} OBs for {month_full}")
     
-    if len(df_filtered) == 0:
-        print(f"\n❌ No targets found for {month_full} window!")
+    if len(all_obs) == 0:
+        print("\n❌ No observations generated!")
         return
     
-    # Generate OBs for all filtered targets
-    print("\nGenerating OBs...")
-    obs_list = []
-    for idx, row in df_filtered.iterrows():
-        ob = create_ob_for_target(row, template_ob, start_date, end_date, strategy)
-        obs_list.append(ob)
-        print(f"  ✓ Created OB for TIC{int(row['ticid'])} (RA={row['ra']:.2f}°)")
-    
     # Save full list
-    output_file_full = OBS_DIR / f'obs_{month}_{YEAR}.json'
+    output_file_full = OBS_DIR / f'obs_{strategy}.json'
     with open(output_file_full, 'w') as f:
-        json.dump(obs_list, f, indent=2)
-    print(f"\n✅ Saved {len(obs_list)} OBs to: {output_file_full}")
+        json.dump(all_obs, f, indent=2)
+    print(f"\n✅ Saved {len(all_obs)} OBs to: {output_file_full}")
     
     # Save test file
-    output_file_test = OBS_DIR / f'obs_{month}_{YEAR}_test.json'
-    test_obs_list = obs_list[:num_test_targets]
+    output_file_test = OBS_DIR / f'obs_{strategy}_test.json'
+    test_obs_list = all_obs[:num_test_targets]
     with open(output_file_test, 'w') as f:
         json.dump(test_obs_list, f, indent=2)
     print(f"✅ Saved {len(test_obs_list)} test OBs to: {output_file_test}")
@@ -282,35 +294,31 @@ def generate_obs(month, strategy='version1', num_test_targets=2):
     print("SUMMARY")
     print("="*60)
     print(f"Strategy: {strategy}")
-    print(f"Month: {month_full}")
-    print(f"Total targets: {len(obs_list)}")
-    print(f"Observation window: {start_date} to {end_date}")
-    print(f"RA range: {ra_min}° to {ra_max}° ({ra_min/15:.1f}-{ra_max/15:.1f} hr)")
+    print(f"Total observations: {len(all_obs)}")
+    print(f"\nBreakdown by month:")
+    for summary in month_summaries:
+        print(f"  • {summary['month']}: {summary['count']} targets")
+        print(f"    RA range: {summary['ra_range']}")
+        print(f"    Window: {summary['time_window']}")
     print(f"\nOutput files:")
-    print(f"  • {output_file_full} - All {len(obs_list)} targets")
+    print(f"  • {output_file_full} - All {len(all_obs)} targets")
     print(f"  • {output_file_test} - First {len(test_obs_list)} targets (for testing)")
     print("="*60)
 
 def main():
     """Parse command line arguments and generate observing blocks."""
     parser = argparse.ArgumentParser(
-        description=f'Generate KPF Observing Blocks for November, December, or January ({YEAR}B semester)',
+        description=f'Generate KPF Observing Blocks for all months in a strategy ({YEAR}B semester)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s --month nov                    # Use default strategy (version1)
-  %(prog)s --month dec
-  %(prog)s --strategy version1 --month jan
-  %(prog)s -s version1 -m nov -t 5        # With 5 test targets
+  %(prog)s                    # Use default strategy (version1)
+  %(prog)s --strategy version1
+  %(prog)s -s version1 -t 5   # With 5 test targets
+
+This generates observations for all months (November, December, January) 
+in a single file named obs_<strategy>.json
         """
-    )
-    
-    parser.add_argument(
-        '-m', '--month',
-        type=str,
-        required=True,
-        choices=['nov', 'dec', 'jan'],
-        help='Month for observations: nov, dec, or jan'
     )
     
     parser.add_argument(
@@ -330,7 +338,7 @@ Examples:
     
     args = parser.parse_args()
     
-    generate_obs(args.month, args.strategy, args.test_targets)
+    generate_obs(args.strategy, args.test_targets)
 
 if __name__ == "__main__":
     main()
