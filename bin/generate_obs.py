@@ -168,6 +168,15 @@ def create_ob_for_target(target_row, template_ob, start_date, end_date):
     # Update observation section - ensure Object matches TargetName
     ob['observation']['Object'] = target_name
     
+    # Update observation parameters from target data
+    if 't_sec_kpf' in target_row.index and not pd.isna(target_row['t_sec_kpf']):
+        ob['observation']['ExpTime'] = str(int(target_row['t_sec_kpf']))
+    
+    if 'expmeter_kpf' in target_row.index and not pd.isna(target_row['expmeter_kpf']):
+        # Convert expmeter_kpf to counts (expmeter_kpf is a fraction, multiply by 100000 for counts)
+        expmeter_threshold = int(target_row['expmeter_kpf'] * 100000)
+        ob['observation']['ExpMeterThreshold'] = expmeter_threshold
+    
     # Update schedule section with time constraints
     ob['schedule']['custom_time_constraints'] = [
         {
