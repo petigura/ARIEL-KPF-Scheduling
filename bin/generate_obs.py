@@ -1,14 +1,44 @@
 #!/usr/bin/env python3
 """
-Generate Observing Blocks (OBs) for November 2025
-Filters targets with RA = 20-24 hr (300-360 degrees) and creates JSON OBs
+Generate Observing Blocks (OBs) for KPF observations (2025B semester)
+Filters targets by month-appropriate RA range and creates JSON OBs
+Supports: November, December, January
 """
 
 import pandas as pd
 import json
 import copy
+import argparse
 from astropy.coordinates import SkyCoord
 from astropy import units as u
+
+# Hard-coded year for this observing semester
+YEAR = 2025
+
+# Month-to-RA mapping for the three observing months
+MONTH_RA_RANGES = {
+    'nov': {
+        'ra_min': 300, 
+        'ra_max': 360, 
+        'full_name': 'November',
+        'start_date': '2025-11-01T12:00',
+        'end_date': '2025-12-01T12:00'
+    },
+    'dec': {
+        'ra_min': 0, 
+        'ra_max': 60, 
+        'full_name': 'December',
+        'start_date': '2025-12-01T12:00',
+        'end_date': '2026-01-01T12:00'
+    },
+    'jan': {
+        'ra_min': 60, 
+        'ra_max': 120, 
+        'full_name': 'January',
+        'start_date': '2026-01-01T12:00',
+        'end_date': '2026-02-01T12:00'
+    },
+}
 
 def load_template():
     """
@@ -28,7 +58,6 @@ def load_template():
         cleaned_lines = []
         for line in lines:
             if '#' in line:
-                # Find the position of # and strip everything after it
                 cleaned_line = line.split('#')[0].rstrip()
                 cleaned_lines.append(cleaned_line)
             else:
@@ -54,33 +83,38 @@ def load_kpf_targets():
     print(f"✓ Loaded {len(df)} KPF targets")
     return df
 
-def filter_november_targets(df):
+def filter_targets_by_ra(df, ra_min, ra_max):
     """
-    Filter targets for November observing window (RA = 20-24 hr = 300-360 degrees).
+    Filter targets by RA range.
     
     Parameters:
     -----------
     df : pandas.DataFrame
         DataFrame containing target information
+    ra_min : float
+        Minimum RA in degrees
+    ra_max : float
+        Maximum RA in degrees
         
     Returns:
     --------
-    pandas.DataFrame : Filtered DataFrame with November targets
+    pandas.DataFrame : Filtered DataFrame with targets in RA range
     """
-    print("\nFiltering targets for November (RA = 20-24 hr)...")
+    print(f"\nFiltering targets for RA range {ra_min}° to {ra_max}° ({ra_min/15:.1f}-{ra_max/15:.1f} hr)...")
     
-    # Filter for RA between 300 and 360 degrees (20-24 hours)
-    df_november = df[(df['ra'] >= 300) & (df['ra'] <= 360)].copy()
+    # Filter for RA between ra_min and ra_max degrees
+    df_filtered = df[(df['ra'] >= ra_min) & (df['ra'] <= ra_max)].copy()
     
     # Sort by RA for better organization
-    df_november = df_november.sort_values('ra')
+    df_filtered = df_filtered.sort_values('ra')
     
-    print(f"✓ Found {len(df_november)} targets in November window")
-    print(f"  RA range: {df_november['ra'].min():.2f}° to {df_november['ra'].max():.2f}°")
+    print(f"✓ Found {len(df_filtered)} targets in window")
+    if len(df_filtered) > 0:
+        print(f"  RA range: {df_filtered['ra'].min():.2f}° to {df_filtered['ra'].max():.2f}°")
     
-    return df_november
+    return df_filtered
 
-def create_ob_for_target(target_row, template_ob):
+def create_ob_for_target(target_row, template_ob, start_date, end_date):
     """
     Create an Observing Block (OB) for a single target.
     
@@ -90,6 +124,10 @@ def create_ob_for_target(target_row, template_ob):
         Row from DataFrame containing target information
     template_ob : dict
         Template OB structure
+    start_date : str
+        Start date in format "YYYY-MM-DDTHH:MM"
+    end_date : str
+        End date in format "YYYY-MM-DDTHH:MM"
         
     Returns:
     --------
@@ -120,11 +158,11 @@ def create_ob_for_target(target_row, template_ob):
     # Update observation section - ensure Object matches TargetName
     ob['observation']['Object'] = target_name
     
-    # Update schedule section with November-December 2025 time constraints
+    # Update schedule section with time constraints
     ob['schedule']['custom_time_constraints'] = [
         {
-            "start_datetime": "2025-11-01T12:00",
-            "end_datetime": "2025-12-01T12:00"
+            "start_datetime": start_date,
+            "end_datetime": end_date
         }
     ]
     
@@ -142,45 +180,65 @@ def create_ob_for_target(target_row, template_ob):
     
     return ob
 
-def generate_november_obs():
+def generate_obs(month, num_test_targets=2):
     """
-    Main function to generate November observing blocks.
-    Creates two output files:
-    - obs_november_2025.json: All November targets
-    - obs_november_2025_test.json: First 2 targets for testing
+    Main function to generate observing blocks for a specific month.
+    
+    Parameters:
+    -----------
+    month : str
+        Month abbreviation ('nov', 'dec', 'jan')
+    num_test_targets : int
+        Number of targets to include in test file
     """
+    month = month.lower()
+    
+    if month not in MONTH_RA_RANGES:
+        print(f"❌ Error: Invalid month '{month}'")
+        print(f"Valid months: {', '.join(MONTH_RA_RANGES.keys())}")
+        return
+    
+    month_info = MONTH_RA_RANGES[month]
+    month_full = month_info['full_name']
+    
     print("="*60)
-    print("GENERATING NOVEMBER 2025 OBSERVING BLOCKS")
+    print(f"GENERATING {month_full.upper()} {YEAR} OBSERVING BLOCKS")
     print("="*60)
     
     # Load template and target data
     template_ob = load_template()
     df = load_kpf_targets()
     
-    # Filter for November targets
-    df_november = filter_november_targets(df)
+    # Get RA range and time window for this month
+    ra_min = month_info['ra_min']
+    ra_max = month_info['ra_max']
+    start_date = month_info['start_date']
+    end_date = month_info['end_date']
     
-    if len(df_november) == 0:
-        print("\n❌ No targets found for November window!")
+    # Filter targets by RA range
+    df_filtered = filter_targets_by_ra(df, ra_min, ra_max)
+    
+    if len(df_filtered) == 0:
+        print(f"\n❌ No targets found for {month_full} window!")
         return
     
-    # Generate OBs for all November targets
+    # Generate OBs for all filtered targets
     print("\nGenerating OBs...")
     obs_list = []
-    for idx, row in df_november.iterrows():
-        ob = create_ob_for_target(row, template_ob)
+    for idx, row in df_filtered.iterrows():
+        ob = create_ob_for_target(row, template_ob, start_date, end_date)
         obs_list.append(ob)
         print(f"  ✓ Created OB for TIC{int(row['ticid'])} (RA={row['ra']:.2f}°)")
     
     # Save full list
-    output_file_full = '../obs/obs_november_2025.json'
+    output_file_full = f'../obs/obs_{month}_{YEAR}.json'
     with open(output_file_full, 'w') as f:
         json.dump(obs_list, f, indent=2)
     print(f"\n✅ Saved {len(obs_list)} OBs to: {output_file_full}")
     
-    # Save test file (first 2 targets)
-    output_file_test = '../obs/obs_november_2025_test.json'
-    test_obs_list = obs_list[:2]
+    # Save test file
+    output_file_test = f'../obs/obs_{month}_{YEAR}_test.json'
+    test_obs_list = obs_list[:num_test_targets]
     with open(output_file_test, 'w') as f:
         json.dump(test_obs_list, f, indent=2)
     print(f"✅ Saved {len(test_obs_list)} test OBs to: {output_file_test}")
@@ -189,13 +247,47 @@ def generate_november_obs():
     print("\n" + "="*60)
     print("SUMMARY")
     print("="*60)
-    print(f"Total November targets: {len(obs_list)}")
-    print(f"Observation window: November 1 - December 1, 2025")
-    print(f"RA range: {df_november['ra'].min():.2f}° to {df_november['ra'].max():.2f}° (20-24 hr)")
+    print(f"Month: {month_full}")
+    print(f"Total targets: {len(obs_list)}")
+    print(f"Observation window: {start_date} to {end_date}")
+    print(f"RA range: {ra_min}° to {ra_max}° ({ra_min/15:.1f}-{ra_max/15:.1f} hr)")
     print(f"\nOutput files:")
     print(f"  • {output_file_full} - All {len(obs_list)} targets")
     print(f"  • {output_file_test} - First {len(test_obs_list)} targets (for testing)")
     print("="*60)
 
+def main():
+    """Parse command line arguments and generate observing blocks."""
+    parser = argparse.ArgumentParser(
+        description=f'Generate KPF Observing Blocks for November, December, or January ({YEAR}B semester)',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s --month nov
+  %(prog)s --month dec
+  %(prog)s --month jan        # Observes in January 2026
+  %(prog)s -m nov -t 5        # With 5 test targets
+        """
+    )
+    
+    parser.add_argument(
+        '-m', '--month',
+        type=str,
+        required=True,
+        choices=['nov', 'dec', 'jan'],
+        help='Month for observations: nov, dec, or jan'
+    )
+    
+    parser.add_argument(
+        '-t', '--test-targets',
+        type=int,
+        default=2,
+        help='Number of targets to include in test file (default: 2)'
+    )
+    
+    args = parser.parse_args()
+    
+    generate_obs(args.month, args.test_targets)
+
 if __name__ == "__main__":
-    generate_november_obs()
+    main()

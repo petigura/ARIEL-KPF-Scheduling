@@ -26,7 +26,6 @@ ARIEL-KPF-Scheduling/
 ├── plots/                        # Generated plots (gitignored)
 │   ├── november_airmass_all.png
 │   └── november_targets_context.png
-├── astroq_analysis/              # AstroQ analysis outputs (gitignored)
 ├── environment.yml               # Conda environment specification
 ├── requirements.txt              # Python package dependencies
 ├── project-description.txt       # Project requirements and guidelines

@@ -1,21 +1,6 @@
 [
   {
-    "calibration": {
-      "CalSource": "EtalonFiber",
-      "nExp": 1,
-      "TriggerCaHK": true,
-      "TriggerGreen": true,
-      "TriggerRed": true,
-      "CalND1": "OD 0.1",
-      "CalND2": "OD 0.1",
-      "OpenScienceShutter": true,
-      "OpenSkyShutter": true,
-      "TakeSimulCal": true,
-      "ExpMeterMode": "off",
-      "ExpMeterExpTime": 1,
-      "ExpMeterBin": 1,
-      "ExpMeterThreshold": 50000
-    },
+    "calibration": {}, # We don't submit calibrations for OBs
     "schedule": {
       "SchedulingMode": "Cadence",
       "DesiredVisitsPerNight": 1,
