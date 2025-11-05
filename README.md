@@ -15,8 +15,6 @@ ARIEL-KPF-Scheduling/
 │   └── paths.py                  # Centralized path management
 ├── bin/                          # Python scripts
 │   ├── generate_obs.py           # Generate observation blocks for nov/dec/jan
-│   ├── plot_november_airmass.py  # Plot airmass for November targets
-│   ├── plot_november_targets.py  # Plot sky distribution
 │   ├── create_kpf_targets.py     # Filter KPF targets from full dataset
 │   └── download_ariel_data.py    # Download target data from Google Sheets
 ├── obs/                          # Observing blocks
@@ -68,7 +66,17 @@ Downloads fresh target data from Google Sheets. Saves timestamped CSV files to `
 python bin/create_kpf_targets.py
 ```
 
-Filters KPF targets from the full ARIEL dataset. Automatically uses the most recent downloaded file.
+Filters KPF targets from the full ARIEL dataset and queries SIMBAD to populate target metadata. This step:
+- Automatically uses the most recent downloaded file
+- **Queries SIMBAD in batches** for all KPF targets (~50 targets per batch)
+- Adds the following columns to the CSV:
+  - `gaia_dr3_id`, `twomass_id` (identifiers)
+  - `parallax`, `pmra`, `pmdec` (astrometry)
+  - `gmag`, `jmag` (photometry)
+  - `rv_value`, `sp_type` (physical properties)
+- Saves timestamped CSV with all data included
+
+**Note:** This step may take several minutes due to SIMBAD queries (~71 targets × ~0.5s per batch). Results are saved in the CSV, so subsequent operations are fast.
 
 ### Generate Observing Blocks
 
@@ -89,34 +97,27 @@ python bin/generate_obs.py -s version1 -t 5
 This will:
 - Process all months defined in the strategy (November, December, January)
 - Filter targets by each month's RA range
-- Automatically use the most recent KPF targets file
+- Automatically use the most recent KPF targets file (with SIMBAD data)
+- Populate observation blocks with target metadata from the CSV:
+  - Gaia DR3 ID, 2MASS ID
+  - Parallax, proper motions (PMRA, PMDEC)
+  - Photometry (Gmag, Jmag)
+  - Radial velocity, spectral type (if available)
 - Generate OBs with appropriate observation windows for each month
-- Create two output files:
+- Create three output files:
   - `obs/obs_<strategy>.json` - All targets from all months (e.g., `obs_version1.json`)
-  - `obs/obs_<strategy>_test.json` - First 2 targets (for testing upload)
+  - `obs/obs_<strategy>_test.json` - First and last targets (2 OBs for quick testing)
+  - `obs/obs_<strategy>_test20.json` - First 10 and last 10 targets (20 OBs for extended testing)
+- **Automatically generate plots** showing:
+  - Target distribution across the sky for all months
+  - Brightness (V-mag) distribution
+  - Airmass curves for each month's targets
 
-### Plot November Target Distribution
+**Note:** This step is fast since SIMBAD data is already in the CSV from the `create_kpf_targets.py` step.
 
-```bash
-python bin/plot_november_targets.py
-```
-
-Generates `plots/november_targets_context.png` showing:
-- November targets (RA 20-24hr) highlighted in context
-- All KPF targets for reference
-- Color-coded by V-magnitude
-
-### Plot Airmass for November Targets
-
-```bash
-python bin/plot_november_airmass.py
-```
-
-Generates `plots/november_airmass_all.png` showing:
-- Airmass curves for all November targets
-- Centered on midnight Hawaii local time
-- Annotated with target names
-- Day/night shading using `astroplan`
+**Generated plots** (automatically created in `plots/` directory):
+- `<strategy>_target_distribution.png` - Sky distribution for all months with color-coding
+- `<strategy>_airmass.png` - Airmass curves for all months' targets
 
 ## Features
 
@@ -124,4 +125,7 @@ Generates `plots/november_airmass_all.png` showing:
 - **Automatic File Discovery**: Scripts automatically find and use the most recent target files
 - **Multi-Month Support**: Generate observations for November, December, and January with appropriate RA ranges
 - **Strategy Versioning**: Support for multiple observing strategies with version tags, enabling A/B testing and strategy evolution
+- **SIMBAD Integration**: Bulk queries SIMBAD during target filtering to populate metadata (Gaia IDs, parallax, proper motions, magnitudes) in the CSV, making downstream operations fast
+- **Automatic Plotting**: Generates visualization plots automatically showing target distribution and airmass curves for all months
+- **Modular Design**: Plotting functions are separated into a dedicated module (`ariel_kpf/plotting.py`) for easy reuse and customization
 - **Flexible Configuration**: Easy to add new strategy versions or modify RA ranges, observation windows, and other parameters

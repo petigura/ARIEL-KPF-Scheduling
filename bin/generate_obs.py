@@ -9,9 +9,11 @@ import pandas as pd
 import json
 import copy
 import argparse
+from pathlib import Path
 from astropy.coordinates import SkyCoord
 from astropy import units as u
-from ariel_kpf.paths import TARGETS_DIR, OBS_DIR, OB_TEMPLATE, get_latest_kpf_targets_file
+from ariel_kpf.paths import TARGETS_DIR, OBS_DIR, OB_TEMPLATE, PLOTS_DIR, get_latest_kpf_targets_file
+from ariel_kpf.plotting import generate_all_plots
 
 # Hard-coded year for this observing semester
 YEAR = 2025
@@ -91,7 +93,8 @@ def load_kpf_targets():
         raise FileNotFoundError("No KPF targets file found")
     
     print(f"Reading: {latest_file.name}")
-    df = pd.read_csv(latest_file)
+    # Read with explicit dtypes to preserve Gaia IDs as strings (not floats)
+    df = pd.read_csv(latest_file, dtype={'gaia_dr3_id': str, 'twomass_id': str})
     print(f"✓ Loaded {len(df)} KPF targets")
     return df
 
@@ -133,7 +136,7 @@ def create_ob_for_target(target_row, template_ob, start_date, end_date, strategy
     Parameters:
     -----------
     target_row : pandas.Series
-        Row from DataFrame containing target information
+        Row from DataFrame containing target information (including SIMBAD data)
     template_ob : dict
         Template OB structure
     start_date : str
@@ -160,7 +163,7 @@ def create_ob_for_target(target_row, template_ob, start_date, end_date, strategy
     ra_str = coord.ra.to_string(unit=u.hourangle, sep=':', precision=2, pad=True)
     dec_str = coord.dec.to_string(unit=u.deg, sep=':', precision=2, pad=True)
     
-    # Update target section
+    # Update target section - basic info
     target_name = f"TIC{ticid}"
     ob['target']['TargetName'] = target_name
     ob['target']['tic_id'] = str(ticid)
@@ -169,12 +172,40 @@ def create_ob_for_target(target_row, template_ob, start_date, end_date, strategy
     ob['target']['ra_deg'] = float(ra_deg)
     ob['target']['dec_deg'] = float(dec_deg)
     
+    # Add SIMBAD metadata from CSV columns (if available)
+    simbad_field_mapping = {
+        'gaia_dr3_id': 'GaiaID',
+        'twomass_id': 'twoMASSID',
+        'parallax': 'Parallax',
+        'gmag': 'Gmag',
+        'jmag': 'Jmag',
+        'pmra': 'PMRA',
+        'pmdec': 'PMDEC',
+        'radial_velocity': 'RadialVelocity',
+    }
+    
+    for csv_col, ob_field in simbad_field_mapping.items():
+        if csv_col in target_row.index and not pd.isna(target_row[csv_col]):
+            ob['target'][ob_field] = target_row[csv_col]
+    
+    # Set RadialVelocity to 0 if not available from SIMBAD
+    if 'RadialVelocity' not in ob['target'] or ob['target']['RadialVelocity'] == "16.33":
+        ob['target']['RadialVelocity'] = 0
+    
+    # Add Teff from target spreadsheet
+    if 'stellar_teff' in target_row.index and not pd.isna(target_row['stellar_teff']):
+        ob['target']['Teff'] = str(int(target_row['stellar_teff']))
+    
     # Update observation section - ensure Object matches TargetName
     ob['observation']['Object'] = target_name
     
     # Update observation parameters from target data
     if 't_sec_kpf' in target_row.index and not pd.isna(target_row['t_sec_kpf']):
-        ob['observation']['ExpTime'] = str(int(target_row['t_sec_kpf'] * 4)) # multiply by 4 to account for upto 4x slowdown
+        exp_time_int = int(target_row['t_sec_kpf'] * 4) # multiply by 4 to account for upto 4x slowdown
+        ob['observation']['ExpTime'] = str(exp_time_int)  # ExpTime is a string
+    
+    # ExpMeterExpTime is always set to 1
+    ob['observation']['ExpMeterExpTime'] = 1
     
     if 'expmeter_kpf' in target_row.index and not pd.isna(target_row['expmeter_kpf']):
         ob['observation']['ExpMeterThreshold'] = target_row['expmeter_kpf']
@@ -204,7 +235,7 @@ def create_ob_for_target(target_row, template_ob, start_date, end_date, strategy
     
     return ob
 
-def generate_obs(strategy='version1', num_test_targets=2):
+def generate_obs(strategy='version1'):
     """
     Main function to generate observing blocks for all months in a strategy.
     
@@ -212,8 +243,6 @@ def generate_obs(strategy='version1', num_test_targets=2):
     -----------
     strategy : str
         Strategy version to use (default: 'version1')
-    num_test_targets : int
-        Number of targets to include in test file
     """
     # Validate strategy
     if strategy not in STRATEGIES:
@@ -282,12 +311,25 @@ def generate_obs(strategy='version1', num_test_targets=2):
         json.dump(all_obs, f, indent=2)
     print(f"\n✅ Saved {len(all_obs)} OBs to: {output_file_full}")
     
-    # Save test file
+    # Save test file (first and last OBs)
     output_file_test = OBS_DIR / f'obs_{strategy}_test.json'
-    test_obs_list = all_obs[:num_test_targets]
+    if len(all_obs) <= 2:
+        test_obs_list = all_obs
+    else:
+        test_obs_list = [all_obs[0], all_obs[-1]]
     with open(output_file_test, 'w') as f:
         json.dump(test_obs_list, f, indent=2)
-    print(f"✅ Saved {len(test_obs_list)} test OBs to: {output_file_test}")
+    print(f"✅ Saved {len(test_obs_list)} test OBs to: {output_file_test} (first and last)")
+    
+    # Save test20 file (first 10 and last 10 OBs)
+    output_file_test20 = OBS_DIR / f'obs_{strategy}_test20.json'
+    if len(all_obs) <= 20:
+        test20_obs_list = all_obs
+    else:
+        test20_obs_list = all_obs[:10] + all_obs[-10:]
+    with open(output_file_test20, 'w') as f:
+        json.dump(test20_obs_list, f, indent=2)
+    print(f"✅ Saved {len(test20_obs_list)} test OBs to: {output_file_test20} (first 10 and last 10)")
     
     # Display summary
     print("\n" + "="*60)
@@ -302,8 +344,16 @@ def generate_obs(strategy='version1', num_test_targets=2):
         print(f"    Window: {summary['time_window']}")
     print(f"\nOutput files:")
     print(f"  • {output_file_full} - All {len(all_obs)} targets")
-    print(f"  • {output_file_test} - First {len(test_obs_list)} targets (for testing)")
+    print(f"  • {output_file_test} - First and last targets (2 OBs for quick testing)")
+    print(f"  • {output_file_test20} - First 10 and last 10 targets (20 OBs for extended testing)")
     print("="*60)
+    
+    # Generate plots
+    try:
+        generate_all_plots(df, STRATEGIES[strategy], strategy, PLOTS_DIR)
+    except Exception as e:
+        print(f"\n⚠ Warning: Could not generate plots: {e}")
+        print("Continuing without plots...")
 
 def main():
     """Parse command line arguments and generate observing blocks."""
@@ -314,10 +364,13 @@ def main():
 Examples:
   %(prog)s                    # Use default strategy (version1)
   %(prog)s --strategy version1
-  %(prog)s -s version1 -t 5   # With 5 test targets
+  %(prog)s -s version1
 
 This generates observations for all months (November, December, January) 
 in a single file named obs_<strategy>.json
+Test files are also generated:
+  - obs_<strategy>_test.json: First and last OBs (2 targets)
+  - obs_<strategy>_test20.json: First 10 and last 10 OBs (20 targets)
         """
     )
     
@@ -329,16 +382,9 @@ in a single file named obs_<strategy>.json
         help='Observing strategy version (default: version1)'
     )
     
-    parser.add_argument(
-        '-t', '--test-targets',
-        type=int,
-        default=2,
-        help='Number of targets to include in test file (default: 2)'
-    )
-    
     args = parser.parse_args()
     
-    generate_obs(args.strategy, args.test_targets)
+    generate_obs(args.strategy)
 
 if __name__ == "__main__":
     main()
