@@ -5,6 +5,8 @@ plots/
 obs/obs_*.json
 targets/*
 
+targets/*.csv
+
 # AstroQ analysis outputs
 astroq_analysis/
 

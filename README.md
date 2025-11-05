@@ -15,8 +15,6 @@ ARIEL-KPF-Scheduling/
 │   └── paths.py                  # Centralized path management
 ├── bin/                          # Python scripts
 │   ├── generate_obs.py           # Generate observation blocks for nov/dec/jan
-│   ├── plot_november_airmass.py  # Plot airmass for November targets
-│   ├── plot_november_targets.py  # Plot sky distribution
 │   ├── create_kpf_targets.py     # Filter KPF targets from full dataset
 │   └── download_ariel_data.py    # Download target data from Google Sheets
 ├── obs/                          # Observing blocks
@@ -79,6 +77,17 @@ Filters KPF targets from the full ARIEL dataset and queries SIMBAD to populate t
 - Saves timestamped CSV with all data included
 
 **Note:** This step may take several minutes due to SIMBAD queries (~71 targets × ~0.5s per batch). Results are saved in the CSV, so subsequent operations are fast.
+Filters KPF targets from the full ARIEL dataset and queries SIMBAD to populate target metadata. This step:
+- Automatically uses the most recent downloaded file
+- **Queries SIMBAD in batches** for all KPF targets (~50 targets per batch)
+- Adds the following columns to the CSV:
+  - `gaia_dr3_id`, `twomass_id` (identifiers)
+  - `parallax`, `pmra`, `pmdec` (astrometry)
+  - `gmag`, `jmag` (photometry)
+  - `rv_value`, `sp_type` (physical properties)
+- Saves timestamped CSV with all data included
+
+**Note:** This step may take several minutes due to SIMBAD queries (~71 targets × ~0.5s per batch). Results are saved in the CSV, so subsequent operations are fast.
 
 ### Generate Observing Blocks
 
@@ -105,7 +114,14 @@ This will:
   - Parallax, proper motions (PMRA, PMDEC)
   - Photometry (Gmag, Jmag)
   - Radial velocity, spectral type (if available)
+- Automatically use the most recent KPF targets file (with SIMBAD data)
+- Populate observation blocks with target metadata from the CSV:
+  - Gaia DR3 ID, 2MASS ID
+  - Parallax, proper motions (PMRA, PMDEC)
+  - Photometry (Gmag, Jmag)
+  - Radial velocity, spectral type (if available)
 - Generate OBs with appropriate observation windows for each month
+- Create three output files:
 - Create three output files:
   - `obs/obs_<strategy>.json` - All targets from all months (e.g., `obs_version1.json`)
   - `obs/obs_<strategy>_test.json` - First and last targets (2 OBs for quick testing)
