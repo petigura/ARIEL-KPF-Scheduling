@@ -3,6 +3,7 @@ plots/
 
 # Generated observation files
 obs/obs_*.json
+targets/*
 
 # AstroQ analysis outputs
 astroq_analysis/
