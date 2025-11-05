@@ -27,10 +27,10 @@
       "twoMASSID": "J21242759-3751005", # Resolve with simbad
       "tic_id": "129637892", # Pull from simbad
       "Parallax": 5.3179,  # Pull from simbad
-      "RadialVelocity": "16.33", # Pull from simbad, leave blank if not available
+      "RadialVelocity": "16.33", # Pull from simbad (rvz_radvel field), set to 0 if not available
       "Gmag": 9.389569,  # Resolve with simbad
       "Jmag": 8.534,  # Resolve with simbad
-      "Teff": "6220",
+      "Teff": "6220", # pull from teff column in the target spreadsheet
       "RA": "21:24:27.5858065560", # Resolve with simbad
       "DEC": "-37:51:00.552487788", # Resolve with simbad
       "ra_deg": 321.1149408606, # Resolve with simbad
@@ -43,13 +43,13 @@
     "observation": {
       "Object": "TIC57093805 ",
       "nExp": "1",
-      "ExpTime": "120", # since we running with exposure time on, this is the maximum time before termination
+      "ExpTime": "120", # update this value from t_sec_kpf, but we want multiply by 4x to account for upto 4x slowdown 
       "TriggerCaHK": true,
       "TriggerGreen": true,
       "TriggerRed": true,
       "ExpMeterMode": "control", # conrol will terminate the observation if the expmeter is triggered
       "AutoExpMeter": true,
-      "ExpMeterExpTime": 1, # update this value from t_sec_kpf, but we want multiply by 4x to account for upto 4x slowdown 
+      "ExpMeterExpTime": 1, # leave this value as a default, since it is set by AutoExpMeter
       "ExpMeterThreshold": 1, # update this value from expmeter_kpf, units are Mphotons/Ang.
       "TakeSimulCal": true,
       "AutoNDFilters": true,

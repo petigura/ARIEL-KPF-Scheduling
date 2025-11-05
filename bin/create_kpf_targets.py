@@ -1,11 +1,116 @@
 #!/usr/bin/env python3
 """
 Create filtered CSV with only KPF targets for analysis
+Includes bulk SIMBAD queries to populate target metadata
 """
 
 import pandas as pd
+import time
 from datetime import datetime
+from astroquery.simbad import Simbad
 from ariel_kpf.paths import TARGETS_DIR, get_latest_targets_file
+
+def query_simbad_bulk(ticids):
+    """
+    Query SIMBAD for multiple targets at once.
+    
+    Parameters:
+    -----------
+    ticids : list or array
+        List of TIC IDs to query
+        
+    Returns:
+    --------
+    dict : Dictionary mapping TIC IDs to SIMBAD data
+    """
+    print(f"\nQuerying SIMBAD for {len(ticids)} targets...")
+    print("This may take a few minutes...")
+    
+    # Configure SIMBAD query
+    custom_simbad = Simbad()
+    custom_simbad.add_votable_fields('ids', 'parallax', 'pmra', 'pmdec', 'G', 'J', 'rvz_radvel')
+    
+    # Map SIMBAD column names to our field names
+    field_mapping = {
+        'plx_value': ('parallax', float),
+        'pmra': ('pmra', float),
+        'pmdec': ('pmdec', float),
+        'G': ('gmag', float),
+        'J': ('jmag', float),
+        'rvz_radvel': ('radial_velocity', float),
+    }
+    
+    # Initialize results dictionary
+    results = {}
+    
+    # Query in batches
+    batch_size = 50
+    total_batches = (len(ticids) + batch_size - 1) // batch_size
+    
+    for i in range(0, len(ticids), batch_size):
+        batch = ticids[i:i+batch_size]
+        batch_num = i // batch_size + 1
+        print(f"  Batch {batch_num}/{total_batches} ({len(batch)} targets)...", end='', flush=True)
+        
+        # Create TIC names for query
+        tic_names = [f"TIC {ticid}" for ticid in batch]
+        
+        try:
+            result_table = custom_simbad.query_objects(tic_names)
+            
+            if result_table is None or len(result_table) == 0:
+                print(f" No results")
+                for ticid in batch:
+                    results[ticid] = {}
+                continue
+            
+            # Process results
+            for ticid in batch:
+                tic_name = f"TIC {ticid}"
+                # Find matching row by user_specified_id column
+                matching_rows = [k for k, row in enumerate(result_table) 
+                               if 'user_specified_id' in row.colnames and tic_name in str(row['user_specified_id'])]
+                
+                if not matching_rows:
+                    results[ticid] = {}
+                    continue
+                
+                row = result_table[matching_rows[0]]
+                simbad_data = {}
+                
+                # Extract IDs from the ids field (keep as strings)
+                if 'ids' in row.colnames and row['ids']:
+                    ids_list = row['ids'].split('|')
+                    for id_item in ids_list:
+                        if 'Gaia DR3' in id_item:
+                            # Keep as string to preserve full precision
+                            simbad_data['gaia_dr3_id'] = str(id_item.strip().replace('Gaia DR3 ', ''))
+                        elif '2MASS J' in id_item:
+                            simbad_data['twomass_id'] = str(id_item.strip().replace('2MASS J', ''))
+                
+                # Extract other fields
+                for simbad_col, (our_field, dtype) in field_mapping.items():
+                    if simbad_col in row.colnames and row[simbad_col] is not None:
+                        try:
+                            simbad_data[our_field] = dtype(row[simbad_col])
+                        except:
+                            pass
+                
+                results[ticid] = simbad_data
+            
+            print(f" ✓ {len(result_table)} found")
+            time.sleep(0.5)  # Respect SIMBAD rate limits
+            
+        except Exception as e:
+            print(f" ⚠ Error: {e}")
+            for ticid in batch:
+                results[ticid] = {}
+    
+    # Count how many targets have data
+    found = sum(1 for data in results.values() if data)
+    print(f"\n✓ SIMBAD queries complete: {found}/{len(ticids)} targets found")
+    
+    return results
 
 def create_kpf_targets_csv():
     """Create a CSV file containing only KPF targets."""
@@ -27,6 +132,27 @@ def create_kpf_targets_csv():
     
     print(f"Original dataset: {len(df)} targets")
     print(f"KPF targets: {len(kpf_targets)} targets")
+    
+    # Query SIMBAD for all KPF targets
+    ticids = kpf_targets['ticid'].tolist()
+    simbad_results = query_simbad_bulk(ticids)
+    
+    # Add SIMBAD data as new columns
+    print("\nAdding SIMBAD data to dataframe...")
+    simbad_columns = ['gaia_dr3_id', 'twomass_id', 'parallax', 'pmra', 'pmdec', 
+                      'gmag', 'jmag', 'radial_velocity']
+    
+    for col in simbad_columns:
+        kpf_targets[col] = kpf_targets['ticid'].apply(
+            lambda ticid: simbad_results.get(ticid, {}).get(col, None)
+        )
+    
+    # Count how many targets have each field
+    print("\nSIMBAD data coverage:")
+    for col in simbad_columns:
+        count = kpf_targets[col].notna().sum()
+        pct = 100 * count / len(kpf_targets)
+        print(f"  {col}: {count}/{len(kpf_targets)} ({pct:.1f}%)")
     
     # Save KPF targets to separate CSV
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
