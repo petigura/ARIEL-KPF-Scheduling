@@ -24,6 +24,8 @@ STRATEGIES = {
         'nov': {
             'ra_min': 300, 
             'ra_max': 360, 
+            'vmag_min': 9.56,
+            'vmag_max': 12.49,
             'full_name': 'November',
             'start_date': '2025-11-01T12:00',
             'end_date': '2025-12-01T12:00'
@@ -31,18 +33,22 @@ STRATEGIES = {
         'dec': {
             'ra_min': 0, 
             'ra_max': 60, 
+            'vmag_min': 9.56,
+            'vmag_max': 12.49,
             'full_name': 'December',
             'start_date': '2025-12-01T12:00',
             'end_date': '2026-01-01T12:00'
         },
         'jan': {
             'ra_min': 60, 
-            'ra_max': 120, 
+            'ra_max': 120,             
+            'vmag_min': 9.56,
+            'vmag_max': 12.49,
             'full_name': 'January',
             'start_date': '2026-01-01T12:00',
             'end_date': '2026-02-01T12:00'
         }
-    }
+    },
 }
 
 def load_template():
@@ -126,6 +132,37 @@ def filter_targets_by_ra(df, ra_min, ra_max):
     print(f"✓ Found {len(df_filtered)} targets in window")
     if len(df_filtered) > 0:
         print(f"  RA range: {df_filtered['ra'].min():.2f}° to {df_filtered['ra'].max():.2f}°")
+    
+    return df_filtered
+
+def filter_targets_by_vmag(df, vmag_min, vmag_max):
+    """
+    Filter targets by RA range.
+    
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        DataFrame containing target information
+    vmag_min : float
+        Minimum V band magnitude
+    vmag_max : float
+        Maximum V band magnitude
+        
+    Returns:
+    --------
+    pandas.DataFrame : Filtered DataFrame with targets in RA range
+    """
+    print(f"\nFiltering targets for V magnitude range {vmag_min} to {vmag_max}")
+    
+    # Filter for V band magnitude between vmag_min and vmag_max magnitudes
+    df_filtered = df[(df['v_mag'] >= vmag_min) & (df['v_mag'] <= vmag_max)].copy()
+    
+    # Sort by V band mag for better organization
+    df_filtered = df_filtered.sort_values('v_mag')
+    
+    print(f"✓ Found {len(df_filtered)} targets in window")
+    if len(df_filtered) > 0:
+        print(f" V Magnitude Range: {df_filtered['v_mag'].min():.2f} to {df_filtered['v_mag'].max():.2f}°")
     
     return df_filtered
 
@@ -268,6 +305,8 @@ def generate_obs(strategy='version1'):
         month_full = month_info['full_name']
         ra_min = month_info['ra_min']
         ra_max = month_info['ra_max']
+        vmag_min = month_info['vmag_min']
+        vmag_max = month_info['vmag_max']
         start_date = month_info['start_date']
         end_date = month_info['end_date']
         
@@ -276,7 +315,10 @@ def generate_obs(strategy='version1'):
         print(f"{'='*60}")
         
         # Filter targets by RA range
-        df_filtered = filter_targets_by_ra(df, ra_min, ra_max)
+        df_filtered_ra = filter_targets_by_ra(df, ra_min, ra_max)
+
+        # Filter targets by magnitude range afterword
+        df_filtered = filter_targets_by_vmag(df_filtered_ra, vmag_min, vmag_max)
         
         if len(df_filtered) == 0:
             print(f"⚠ No targets found for {month_full} window - skipping")
