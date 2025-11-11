@@ -137,7 +137,7 @@ def filter_targets_by_ra(df, ra_min, ra_max):
 
 def filter_targets_by_vmag(df, vmag_min, vmag_max):
     """
-    Filter targets by RA range.
+    Filter targets by V magnitude range.
     
     Parameters:
     -----------
@@ -150,7 +150,7 @@ def filter_targets_by_vmag(df, vmag_min, vmag_max):
         
     Returns:
     --------
-    pandas.DataFrame : Filtered DataFrame with targets in RA range
+    pandas.DataFrame : Filtered DataFrame with targets in V magnitude range
     """
     print(f"\nFiltering targets for V magnitude range {vmag_min} to {vmag_max}")
     
