@@ -2,7 +2,7 @@
 """
 Generate Observing Blocks (OBs) for KPF observations (2025B semester)
 Filters targets by month-appropriate RA range and creates JSON OBs
-Supports: November, December, January
+Supports: November, December, January (version1); February/March, April/May, June/July (version2)
 """
 
 import pandas as pd
@@ -16,7 +16,7 @@ from ariel_kpf.paths import TARGETS_DIR, OBS_DIR, OB_TEMPLATE, PLOTS_DIR, get_la
 from ariel_kpf.plotting import generate_all_plots
 
 # Hard-coded year for this observing semester
-YEAR = 2025
+YEAR = 2026
 
 # Observing strategies - nested dictionary: STRATEGIES[version][month]
 STRATEGIES = {
@@ -47,6 +47,35 @@ STRATEGIES = {
             'full_name': 'January',
             'start_date': '2026-01-01T12:00',
             'end_date': '2026-02-01T12:00'
+        }
+    },
+    'version2': {
+        'feb/mar': {
+            'ra_min': 120, 
+            'ra_max': 180, 
+            'vmag_min': 9.43,
+            'vmag_max': 12.441,
+            'full_name': 'February/March',
+            'start_date': '2026-02-01T12:00',
+            'end_date': '2026-04-01T12:00'
+        },
+        'apr/may': {
+            'ra_min': 180, 
+            'ra_max': 240, 
+            'vmag_min': 9.43,
+            'vmag_max': 12.441,
+            'full_name': 'April/May',
+            'start_date': '2026-04-01T12:00',
+            'end_date': '2026-06-01T12:00'
+        },
+        'jun/jul': {
+            'ra_min': 240, 
+            'ra_max': 300,             
+            'vmag_min': 9.43,
+            'vmag_max': 12.441,
+            'full_name': 'June/July',
+            'start_date': '2026-06-01T12:00',
+            'end_date': '2026-08-01T12:00'
         }
     },
 }
@@ -408,7 +437,7 @@ Examples:
   %(prog)s --strategy version1
   %(prog)s -s version1
 
-This generates observations for all months (November, December, January) 
+This generates observations for all months (November, December, January, February/March, April/May, June/July) 
 in a single file named obs_<strategy>.json
 Test files are also generated:
   - obs_<strategy>_test.json: First and last OBs (2 targets)
@@ -420,7 +449,7 @@ Test files are also generated:
         '-s', '--strategy',
         type=str,
         default='version1',
-        choices=['version1'],
+        choices=['version1', 'version2'],
         help='Observing strategy version (default: version1)'
     )
     
