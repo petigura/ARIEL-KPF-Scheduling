@@ -11,8 +11,8 @@ N_PLANETS = 1
 # Define global planetary system and dataset parameters
 starname = f"tic{{ ticid }}"
 nplanets = N_PLANETS    # number of planets in the system
-if nplanets != 2:
-    starname += f'_{nplanets}_planets'
+#if nplanets != 2:
+#    starname += f'_{nplanets}_planets'
 instnames = ['kpf']    # list of instrument names. Can be whatever you like (no spaces) but should match 'tel' column in the input file.
 ntels = len(instnames)       # number of instruments with unique velocity zero-points
 fitting_basis = 'per tc secosw sesinw logk'    # Fitting basis, see radvel.basis.BASIS_NAMES for available basis names
@@ -48,7 +48,7 @@ anybasis_params['curv'] = radvel.Parameter(value=0.0)        # curvature: (If rv
 # analytically calculate gamma if vary=False and linear=True
 anybasis_params['gamma_kpf'] = radvel.Parameter(value=np.mean(data['mnvel']))       # velocity zero-point for kpf
 
-anybasis_params['jit_kpf'] = radvel.Parameter(value=0)        # jitter for kpf
+anybasis_params['jit_kpf'] = radvel.Parameter(value=1.0)        # jitter for kpf
 
 
 
@@ -62,8 +62,8 @@ params['dvdt'].vary = False
 params['curv'].vary = False
 params['per1'].vary = False
 params['tc1'].vary = False
-params['e1'].vary = False
-params['w1'].vary = False
+params['secosw1'].vary = False
+params['sesinw1'].vary = False
 
 
 
@@ -77,7 +77,7 @@ priors = [
     radvel.prior.HardBounds('logk1', np.log(1e-3), np.log(70)),
     radvel.prior.EccentricityPrior( nplanets ),           # Keeps eccentricity < 1
     radvel.prior.HardBounds('jit_kpf', 0.0, 10.0),
-    radvel.prior.HardBounds('gamma_kpf', -10.0, 10.0),
+    radvel.prior.HardBounds('gamma_kpf', -10.0e6, 10.0e6),
 
 ]
 if nplanets > 1:
