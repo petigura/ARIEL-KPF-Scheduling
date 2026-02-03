@@ -14,7 +14,8 @@ def download_ariel_targets_csv():
     print("Downloading ARIEL targets data from Google Sheets...")
     
     # Google Sheets public CSV URL
-    spreadsheet_url = "https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/export?format=csv"
+    spreadsheet_url = "https://docs.google.com/spreadsheets/d/1gAAznK9h4rC-JTsTA1V8eBtJKIj53AjrTiyIJVjrGuE/export?format=csv&gid=223808981"
+
     
     try:
         # Download the data
